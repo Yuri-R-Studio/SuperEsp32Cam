@@ -12,7 +12,10 @@ Visual Studio Code - https://code.visualstudio.com/download
 
 
 **Development Board**
+
 ![](Documentation/BoardPic.PNG)
 
+
 **Schematic**
+
 ![](Documentation/SchematicWebCamera.png)
