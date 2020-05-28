@@ -18,15 +18,15 @@ Hardware::Hardware() :	_gpio(),
 						_debugPort(&_gpio, UartPort::Uart0, 115200, Gpio::GpioIndex::Gpio3, Gpio::GpioIndex::Gpio1),
 						_spiffs(),
 						_camera(&_gpio),
-						_leds(&_gpio),
 						_rng(),
 						_wifiDriver(),
 						_flash(),
 						_bankConfig(),
 						_spi(),
 						_timerInterruptHandler(),
-						_timer(&_timerInterruptHandler, TimerSelect::Timer0),
-					//    _i2s(&_gpio, Hal::I2sBus::Bus_0, I2sBitSample::Sample16Bits, I2sChannelMode::ChannelMono)
+						_timer0(&_timerInterruptHandler, TimerSelect::Timer0),
+						_timer1(&_timerInterruptHandler, TimerSelect::Timer1),
+						_leds(&_gpio, &_timer1),
 						_dac(&_gpio, Gpio::GpioIndex::Gpio25)
 
 {
@@ -34,7 +34,6 @@ Hardware::Hardware() :	_gpio(),
 	esp_base_mac_addr_get(_macAdrress.data());
 	printf("SDK Version         		: %s\n", (char *)esp_get_idf_version());
 	printf("CPU Cores           		: %d\n", _mcuInfo.cores);
-	// printf("CPU Clock           		: %d MHz\n", rtc_clk_cpu_freq_value(rtc_clk_cpu_freq_get()));
 	printf("APB Clock           		: %d Hz\n", GetSystemClockBase());
 	printf("CPU Revision        		: %d\n", _mcuInfo.revision);
 	printf("Embedded Flash      		: %s\n", (_mcuInfo.features & CHIP_FEATURE_EMB_FLASH) ? "YES" : "NO");
@@ -46,7 +45,6 @@ Hardware::Hardware() :	_gpio(),
 		   _macAdrress[1],
 		   _macAdrress[2],
 		   _macAdrress[3]);
-	// printf("RTC counter         		: %d\n", system_get_time());
 	printf("MCU Free Heap       		: %d\n", esp_get_free_heap_size());
 #ifndef HARDWARE_TESTER
 	printf("MCU Project Heap Allocated	: %d\n", configTOTAL_PROJECT_HEAP_SIZE_ALLOCATED);
@@ -66,9 +64,9 @@ Hardware::Hardware() :	_gpio(),
 		printf("!!! Error: Only one instance of System can be created !!!\n");
 
 	_spiffs.Mount();
-	_timer.Initlialize();
-	// _timer.AddCallback(this);
-	// _timer.Start();
+	_timer0.Initlialize();
+	// _timer0.AddCallback(this);
+	// _timer0.Start();
 }
 
 uint32_t Hardware::GetSystemClockBase()

@@ -44,9 +44,9 @@ public:
 	Flash &GetFlash() { return _flash; }
 	BankConfiguration &GetBunkConfiguration() { return _bankConfig; }
 	Spi &GetSpi() { return _spi; }
-	Timer &GetTimer0() { return _timer; }
+	Timer &GetTimer0() { return _timer0; }
+	Timer &GetTimer1() { return _timer1; }
 	Adc &GetAdc() { return _adc; }
-	// I2s &GetI2s() { return _i2s; }
 	Dac &GetDac() { return _dac; }
 	
 	uint32_t Milliseconds();
@@ -85,15 +85,15 @@ private:
 	esp_chip_info_t _mcuInfo;
 	MacAddress _macAdrress;
 	Camera _camera;
-	Leds _leds;
 	Rng _rng;
 	WifiDriver _wifiDriver;
 	Flash _flash;
 	BankConfiguration _bankConfig;
 	Spi _spi;
 	TimerInterruptHandler _timerInterruptHandler;
-	Timer _timer;
-	// I2s _i2s;
+	Timer _timer0;
+	Timer _timer1;
+	Leds _leds;
 	Dac _dac;
 };
 } // namespace Hal
