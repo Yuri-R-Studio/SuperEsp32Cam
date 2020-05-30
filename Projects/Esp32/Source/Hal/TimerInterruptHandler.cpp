@@ -11,6 +11,8 @@
 #include "driver/periph_ctrl.h"
 #include "driver/timer.h"
 
+#define DEBUG_TIMER_INTERRUPTION
+
 namespace Hal
 {
 
@@ -48,8 +50,8 @@ void TimerInterruptHandler::SetLoad(Preemption preemption, uint32_t value)
 
 bool TimerInterruptHandler::SetFrequency(TimerInterruptHandler::Callback *handler)
 {
-	if (handler->Preemption == Hal::Preemption::TIMER0 ||
-		handler->Preemption == Hal::Preemption::TIMER1)
+	if (handler->Preemption == Preemption::TIMER0 ||
+		handler->Preemption == Preemption::TIMER1)
 	{
 		TimerSelect timer = (handler->Preemption == Preemption::TIMER0) ? TimerSelect::Timer0 : TimerSelect::Timer1;
 
@@ -116,36 +118,12 @@ void TimerInterruptHandler::SetCallback(TimerInterruptHandler::Callback *handler
 	{
 		return;
 	}
-	timer_idx_t timer;
-	timer_config_t config;
+
 	handler->InterruptHandlerProcessing = this;
 
 	if (handler->Frequency == 0)
 		return;
-
-	if (handler->Preemption == Preemption::TIMER0)
-		timer = TIMER_0;
-	else if (handler->Preemption == Preemption::TIMER1)
-		timer = TIMER_1;
-	else
-		return;
-
-	// Configuring the TIMER
-	config.divider = TimerDivider;
-	config.counter_dir = TIMER_COUNT_UP;
-	config.counter_en = TIMER_PAUSE;
-	config.alarm_en = TIMER_ALARM_EN;
-	config.intr_type = TIMER_INTR_LEVEL;
-	config.auto_reload = (timer_autoreload_t)handler->AutoReload;
-	timer_init(TIMER_GROUP_0, timer, &config);
-
-	timer_set_counter_value(TIMER_GROUP_0, timer, 0);
-
-	timer_set_alarm_value(TIMER_GROUP_0, timer, CountsPerSecond / handler->Frequency);
-
-	timer_isr_register(TIMER_GROUP_0, timer, CallbackHandler,
-						(void *)handler, ESP_INTR_FLAG_IRAM, NULL);
-
+		
 	callbackList[interruptIndex] = handler;
 }
 
@@ -159,21 +137,39 @@ void TimerInterruptHandler::InterruptProcessor(Hal::Preemption preemption)
 	}
 }
 
-void TimerInterruptHandler::Enable(Hal::Preemption preemption)
+void TimerInterruptHandler::Enable(TimerInterruptHandler::Callback *handler)
 {
-	switch (preemption)
-	{
-	case Hal::Preemption::TIMER0:
-		timer_enable_intr(TIMER_GROUP_0, TIMER_0);
-		timer_start(TIMER_GROUP_0, TIMER_0);
-		break;
-	case Hal::Preemption::TIMER1:
-		timer_enable_intr(TIMER_GROUP_0, TIMER_1);
-		timer_start(TIMER_GROUP_0, TIMER_1);
-		break;
-	default:
-		break;
-	}
+	timer_idx_t timer = TIMER_0;
+	timer_config_t config = {};
+
+	if (handler->Preemption == Preemption::TIMER0)
+		timer = TIMER_0;
+	else if (handler->Preemption == Preemption::TIMER1)
+		timer = TIMER_1;
+
+#ifdef DEBUG_TIMER_INTERRUPTION
+	for(uint8_t i = 0; i < 2; i ++)
+		if (callbackList[i] == nullptr)
+			printf("\n\ncallbackList %d == null\n\n", i);
+		else
+			printf("\n\ncallbackList %d != null\n\n", i);
+#endif
+	
+	// Configuring the TIMER
+	config.divider = TimerDivider;
+	config.counter_dir = TIMER_COUNT_UP;
+	config.counter_en = TIMER_PAUSE;
+	config.alarm_en = TIMER_ALARM_EN;
+	config.intr_type = TIMER_INTR_LEVEL;
+	config.auto_reload = (timer_autoreload_t)handler->AutoReload;
+	timer_init(TIMER_GROUP_0, timer, &config);
+	timer_set_counter_value(TIMER_GROUP_0, timer, 0);
+	timer_set_alarm_value(TIMER_GROUP_0, timer, CountsPerSecond / handler->Frequency);
+	timer_isr_register(TIMER_GROUP_0, timer, CallbackHandler,
+						(void *)handler, ESP_INTR_FLAG_IRAM, NULL);
+
+	timer_enable_intr(TIMER_GROUP_0, timer);
+	timer_start(TIMER_GROUP_0, timer);
 }
 
 void TimerInterruptHandler::Disable(Hal::Preemption preemption)

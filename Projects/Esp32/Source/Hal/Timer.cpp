@@ -4,109 +4,109 @@
 namespace Hal
 {
 
-Timer::Timer(Hal::TimerInterruptHandler *itrpHandler, TimerSelect timerSelected) : 
-				interruptHandler(itrpHandler)
-{
-	switch (timerSelected)
+	Timer::Timer(TimerInterruptHandler *itrpHandler, TimerSelect timerSelected) : interruptHandler(itrpHandler)
 	{
-	case TimerSelect::Timer0:
-		this->Preemption = Hal::Preemption::TIMER0;
-		break;
-	case TimerSelect::Timer1:
-		this->Preemption = Hal::Preemption::TIMER1;
-		break;
-	}
-
-}
-
-Timer::~Timer()
-{
-}
-
-void Timer::Initlialize()
-{
-#ifdef DEBUG_TIMER
-	printf("Setting timer callback\n");
-#endif
-	// Initialize timer with 1 Hz
-	this->Frequency = 1;
-
-	if (this->Preemption == Preemption::TIMER0)
-		this->AutoReload = false;
-	else
-		this->AutoReload = true;
-
-	for (uint8_t i = 0; i < MaxTimerCallBack; i++)
-	{
-		callbackList[i] = nullptr;
-	}
-
-	interruptHandler->SetCallback(this);
-
-}
-
-void Timer::InterruptCallback()
-{
-	// Call all interruptions registered in this timer
-#ifdef DEBUG_TIMER
-	printf("Timer::InterruptCallback()\n");
-#endif
-
-	for (uint8_t i = 0; i < MaxTimerCallBack; i++)
-	{
-		if (callbackList[i] != nullptr)
+		switch (timerSelected)
 		{
-			callbackList[i]->TimerCallback();
-#ifdef DEBUG_TIMER
-			printf("CallbackList %d: OKAY\n", i);
+		case TimerSelect::Timer0:
+			this->Preemption = Preemption::TIMER0;
+			break;
+		case TimerSelect::Timer1:
+			this->Preemption = Preemption::TIMER1;
+			break;
 		}
+	}
+
+	Timer::~Timer()
+	{
+	}
+
+	void Timer::Initlialize()
+	{
+#ifdef DEBUG_TIMER
+		printf("Setting timer callback\n");
+#endif
+		// Initialize timer with 1 Hz
+		this->Frequency = 1;
+
+		if (this->Preemption == Preemption::TIMER0)
+			this->AutoReload = false;
 		else
-			printf("CallbackList %d: NULL\n", i);
-#else
+			this->AutoReload = true;
+
+		for (uint8_t i = 0; i < MaxTimerCallBack; i++)
+		{
+			callbackList[i] = nullptr;
 		}
-#endif
+
+		interruptHandler->SetCallback(this);
 	}
-}
 
-void Timer::Start()
-{
-	if (Frequency != 0)
-		interruptHandler->Enable(this->Preemption);
-}
+	void Timer::InterruptCallback()
+	{
+		// Call all interruptions registered in this timer
+#ifdef DEBUG_TIMER
+		printf("Timer::InterruptCallback()\n");
+#endif
 
-void Timer::Stop()
-{
-	interruptHandler->Disable(this->Preemption);
-}
+		for (uint8_t i = 0; i < MaxTimerCallBack; i++)
+		{
+			if (callbackList[i] != nullptr)
+			{
+				callbackList[i]->TimerCallback();
+#ifdef DEBUG_TIMER
+				printf("CallbackList %d: OKAY\n", i);
+			}
+			else
+				printf("CallbackList %d: NULL\n", i);
+#else
+			}
+#endif
+		}
+	}
 
-void Timer::SetTimer(uint32_t frequency)
-{
-	if (frequency == 0)
-		return;
+	void Timer::Start()
+	{
+	#ifdef DEBUG_TIMER
+		printf("\n\nStart Timer %d, Freq: %d\n\n", (this->Preemption == Preemption::TIMER0) ? 0 : 1, this->Frequency);
+	#endif
+		if (Frequency != 0)
+			interruptHandler->Enable(this);
+	}
 
-	this->Frequency = (frequency + frequency / 25) * 2;
-	interruptHandler->SetFrequency(this);
-}
+	void Timer::Stop()
+	{
+		interruptHandler->Disable(this->Preemption);
+	}
 
-bool Timer::AddCallback(Timer::Callback *timerCallback)
-{
+	void Timer::SetTimer(uint32_t frequency)
+	{
+		if (frequency == 0)
+			return;
+
+		this->Frequency = (frequency + frequency / 25) * 2;
+		interruptHandler->SetFrequency(this);
+	}
+
+	bool Timer::AddCallback(Timer::Callback *timerCallback)
+	{
 
 #ifdef DEBUG_TIMER
-	printf("Timer::AddCallback()\n");
+		printf("Timer::AddCallback()\n");
 #endif
 
-	if (timerCallback == nullptr)
-		return false;
+		if (timerCallback == nullptr)
+			return false;
 
-	for (uint8_t i = 0; i < MaxTimerCallBack; i++)
-	{
-		if (callbackList[i] == nullptr)
+		for (uint8_t i = 0; i < MaxTimerCallBack; i++)
 		{
-			callbackList[i] = timerCallback;
-			return true;
+			if (callbackList[i] == nullptr)
+			{
+				callbackList[i] = timerCallback;
+				return true;
+			}
 		}
+		return false;
 	}
-	return false;
-}
 
 } // namespace Hal

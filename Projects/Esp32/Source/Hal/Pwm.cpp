@@ -60,7 +60,7 @@ void Pwm::SetDutyCycle(PwmIndex pwm, uint32_t dutyCycle)
 
 void Pwm::StartPwm()
 {
-	_itrpHandler->Enable(this->Preemption);
+	_itrpHandler->Enable(this);
 	for (auto &pin : pwmPins)
 	{
 		if (pin.Enabled)

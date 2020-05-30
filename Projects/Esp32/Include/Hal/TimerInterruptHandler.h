@@ -26,7 +26,7 @@ public:
 	bool SetFrequency(TimerInterruptHandler::Callback *handler);
 	void SetCallback(Callback *callback);
 	static void IRAM_ATTR CallbackHandler(void *arg);
-	void Enable(Hal::Preemption preemption);
+	void Enable(TimerInterruptHandler::Callback *handler);
 	void Disable(Hal::Preemption preemption);
 	void InterruptProcessor(Hal::Preemption preemption);
 	uint32_t GetLoad(Preemption preemption);

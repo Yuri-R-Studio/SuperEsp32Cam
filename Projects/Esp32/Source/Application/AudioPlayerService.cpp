@@ -53,7 +53,7 @@ void AudioPlayerService::resetAudioBudder()
 
 void AudioPlayerService::TimerCallback()
 {
-	Hal::Hardware::Instance()->GetLeds().Toggle(Hal::Leds::LedIndex::Blue);
+	// Hal::Hardware::Instance()->GetLeds().Toggle(Hal::Leds::LedIndex::Blue);
 	if (_audioBuffer.Free() > 0)
 	{
 		uint32_t temp = _hardware->GetAdc().GetAdcValue(_microphone);
