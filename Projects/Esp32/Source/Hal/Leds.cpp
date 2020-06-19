@@ -1,53 +1,126 @@
 
 #include "HalCommon.h"
 #include "Leds.h"
+#include "Dwt.h"
+
+// #define DEBUG_LEDS
+
+#ifdef DEBUG_LEDS
+#define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c\n"
+#define BYTE_TO_BINARY(byte)  \
+  (byte & 0x00800000 ? '1' : '0'), \
+  (byte & 0x00400000 ? '1' : '0'), \
+  (byte & 0x00200000 ? '1' : '0'), \
+  (byte & 0x00100000 ? '1' : '0'), \
+  (byte & 0x00080000 ? '1' : '0'), \
+  (byte & 0x00040000 ? '1' : '0'), \
+  (byte & 0x00020000 ? '1' : '0'), \
+  (byte & 0x00010000 ? '1' : '0'), \
+  (byte & 0x00008000 ? '1' : '0'), \
+  (byte & 0x00004000 ? '1' : '0'), \
+  (byte & 0x00002000 ? '1' : '0'), \
+  (byte & 0x00001000 ? '1' : '0'), \
+  (byte & 0x00000800 ? '1' : '0'), \
+  (byte & 0x00000400 ? '1' : '0'), \
+  (byte & 0x00000200 ? '1' : '0'), \
+  (byte & 0x00000100 ? '1' : '0'), \
+  (byte & 0x00000080 ? '1' : '0'), \
+  (byte & 0x00000040 ? '1' : '0'), \
+  (byte & 0x00000020 ? '1' : '0'), \
+  (byte & 0x00000010 ? '1' : '0'), \
+  (byte & 0x00000008 ? '1' : '0'), \
+  (byte & 0x00000004 ? '1' : '0'), \
+  (byte & 0x00000002 ? '1' : '0'), \
+  (byte & 0x00000001 ? '1' : '0') 
+#endif		
 
 namespace Hal
 {
 
-Leds::Leds(Gpio *IoPins) : _gpio(IoPins)
+Leds::Leds(Gpio *IoPins, Timer* timer, I2sDigital *i2s) : _gpio(IoPins), _timer(timer), _i2s(i2s)
 {
 	// Initializing all leds as output
-	for (auto &led : ledsIndex)
+	_gpio->ConfigOutput(_ledPin, Gpio::OutputType::PullUp);
+	_timer->Initlialize();
+	_timer->SetTimer(BitFrequency);
+	_timer->AddCallback(this);
+	// _cacheLeds[0].Green = 255;
+	_i2s->Init(Hal::I2sBitSample::Sample16Bits, MaxLeds * LedColors * BytesPerColor, RefreshFrequency, false);
+	// _timer->Start();
+	// Gpio::GpioIndex _ledPin = Gpio::GpioIndex::Gpio33;
+	// uint32_t gpioPinIndex = (1 << ((static_cast<uint32_t>(_ledPin) - 32)));
+	printf("\n\nInit Led\nLed pin:%d, index:%d\n",(static_cast<uint32_t>(_ledPin)), gpioPinIndex);
+
+	uint8_t ledBuffer [LedColors * BytesPerColor] = {};	
+	for (uint16_t ledIndex = 0; ledIndex < _outputLeds.size(); ledIndex++)
 	{
-		_gpio->SetMode(led, Gpio::Mode::Output);
-		_gpio->Reset(led);
+		_outputLeds[ledIndex] = BlankColor;
+		for(uint8_t ledByte = 0; ledByte < sizeof(LedColor); ledByte++)
+		{
+			uint32_t bitsLong = 0;
+			for(uint8_t bit = 7; bit <= 7; bit--)
+			{
+				bitsLong |= ((((_outputLeds[ledIndex].Led.Bytes.data()[ledByte] >> bit) & 1) << 1) | 0b100) << (bit * 3 + 8);
+			}
+#ifdef DEBUG_LEDS
+			printf("ledByte %d ", ledByte);
+			printf("+0x%02x ", _outputLeds[ledIndex].Led.Bytes.data()[ledByte]);
+			bitsLong = bitsLong >> 8;
+			printf(BYTE_TO_BINARY_PATTERN, BYTE_TO_BINARY(bitsLong));
+#endif	
+		}
+	
+		// lut[v] = b;
+		
+		// Green color (0b10010010 0b01001001 0b00100100)
+		// ledBuffer[0]
 	}
+}
+
+void Leds::TimerCallback()
+{
+	Refresh();
+	// sendBit1();
+	// sendBit0();
+	// GPIO.out1_w1ts.data = gpioPinIndex;
+	// GPIO.out1_w1ts.data = gpioPinIndex;
+	// _gpio->Set(_ledPin);
+	// _gpio->Reset(_ledPin);
+	// _gpio->Reset(_ledPin);
 }
 
 Leds::~Leds()
 {
 }
 
-void Leds::SetLed(LedIndex led)
+bool Leds::SetLedColour(uint16_t ledIndex, LedColor colour)
 {
-	_gpio->Set(ledsIndex[static_cast<uint8_t>(led)]);
+	// if (ledIndex >= _cacheLeds.size())
+	// 	return false;
+	
+	// _cacheLeds[ledIndex] = colour;
+	return true;
 }
 
-void Leds::SetAll()
+void Leds::SetAllLeds(LedsArray &array)
 {
-	for (auto &led : ledsIndex)
-	{
-		_gpio->Set(led);
-	}
+	// for(uint8_t i = 0; i < _cacheLeds.size(); i ++)
+	// 	_cacheLeds[i] = array[i];
 }
 
-void Leds::ResetAll()
+void Leds::ResetAllLeds()
 {
-	for (auto &led : ledsIndex)
-	{
-		_gpio->Reset(led);
-	}
+	// LedColor empty = {};
+	// for(uint8_t i = 0; i < _cacheLeds.size(); i ++)
+	// 	_cacheLeds[i] = empty;
 }
 
-void Leds::ResetLed(LedIndex led)
+void Leds::Refresh()
 {
-	_gpio->Reset(ledsIndex[static_cast<uint8_t>(led)]);
-}
+	// uint32_t colour = (_cacheLeds[0].Green << 16)
+	// 					+ (_cacheLeds[0].Red << 8)
+	// 					+ (_cacheLeds[0].Blue);
 
-void Leds::Toggle(LedIndex led)
-{
-	_gpio->Toggle(ledsIndex[static_cast<uint8_t>(led)]);
 }
 
 } // namespace Hal

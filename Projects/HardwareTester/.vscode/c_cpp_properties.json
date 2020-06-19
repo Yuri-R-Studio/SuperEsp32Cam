@@ -26,7 +26,8 @@
                 "${workspaceFolder}/../Esp32/Include/Application/",
                 "${workspaceFolder}/../Esp32/Libraries/freertos-addons/Source/include",
                 "${env:IDF_TOOLS}/**",
-                "${env:IDF_PATH}/components/**"
+                "${env:IDF_PATH}/components/**",
+                "C:/YuriCode/SuperEsp32Cam/Projects/Esp32/Include/Hal/Camera/Conversions"
             ],
             "defines": [],
             "cStandard": "c11",

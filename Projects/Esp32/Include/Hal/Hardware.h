@@ -25,6 +25,7 @@
 #include "Timer.h"
 #include "TimerInterruptHandler.h"
 #include "Dac.h"
+#include "I2sDigital.h"
 
 namespace Hal
 {
@@ -48,6 +49,7 @@ public:
 	Timer &GetTimer1() { return _timer1; }
 	Adc &GetAdc() { return _adc; }
 	Dac &GetDac() { return _dac; }
+	I2sDigital &GetI2s() { return _i2sDigital; }
 	
 	uint32_t Milliseconds();
 	void TimerCallback();
@@ -93,8 +95,9 @@ private:
 	TimerInterruptHandler _timerInterruptHandler;
 	Timer _timer0;
 	Timer _timer1;
-	Leds _leds;
 	Dac _dac;
+	I2sDigital _i2sDigital;
+	Leds _leds;
 };
 } // namespace Hal
 

@@ -90,6 +90,7 @@
 			"streambuf": "cpp",
 			"thread": "cpp",
 			"typeinfo": "cpp"
-		}
+		},
+		"git.ignoreLimitWarning": true
 	}
 }

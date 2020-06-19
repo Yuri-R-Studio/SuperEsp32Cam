@@ -23,6 +23,7 @@ char ReadKey();
 void ReadString(char * string, uint8_t size);
 void CameraMenu();
 void TestTimer();
+void TestI2sClock();
 
 const char *GetTestPhrase();
 
@@ -31,11 +32,15 @@ class TestClass : Timer::Callback
 public:
     TestClass()
     {
-        Hal::Hardware::Instance()->GetTimer0().AddCallback(this);
+        // Hal::Hardware::Instance()->GetTimer0().AddCallback(this);
+        Hardware::Instance()->GetGpio().ConfigOutput(Hal::Gpio::GpioIndex::Gpio26,
+            Hal::Gpio::OutputType::PullUp);
     }
     void TimerCallback() override
     {
-        Hardware::Instance()->GetLeds().Toggle(Hal::Leds::LedIndex::Blue);
+       Hardware::Instance()->GetGpio().Set(Hal::Gpio::GpioIndex::Gpio26);
+       Hal::Dwt::DelayMilliseconds(40);
+       Hardware::Instance()->GetGpio().Reset(Hal::Gpio::GpioIndex::Gpio26);
     }
 };
 

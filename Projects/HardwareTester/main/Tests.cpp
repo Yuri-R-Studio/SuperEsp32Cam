@@ -17,7 +17,8 @@ static const char *_STREAM_BOUNDARY = "\r\n--" PART_BOUNDARY "\r\n";
 static const char *_STREAM_PART = "Content-Type: image/jpeg\r\nContent-Length: %u\r\n\r\n";
 httpd_handle_t web_stream_httpd = NULL;
 
-bool start = true;
+bool startTimer = true;
+bool startI2s = true;
 
 static esp_err_t stream_handler(httpd_req_t *req)
 {
@@ -354,13 +355,13 @@ void LedMenu()
 		case 'q':
 		case 'Q':
 		{
-			Hardware::Instance()->GetLeds().SetLed(Hal::Leds::LedIndex::Blue);
+			//Hardware::Instance()->GetLeds().SetLed(Hal::Leds::LedIndex::Blue);
 		}
 		break;
 		case 'a':
 		case 'A':
 		{
-			Hardware::Instance()->GetLeds().ResetLed(Hal::Leds::LedIndex::Blue);
+			//Hardware::Instance()->GetLeds().ResetLed(Hal::Leds::LedIndex::Blue);
 		}
 		break;
 		case 'x':
@@ -484,19 +485,61 @@ void CameraMenu()
 	}
 }
 
+static void spin_task(void *arg)
+{
+	printf("\nStarting Timer 1 with 5Hz\n");
+
+    while (1)
+	{
+		Hardware::Instance()->GetLeds().Refresh();
+        vTaskDelay(100);
+    }
+}
+
 void TestTimer()
 {
-	if (start)
+	if (startTimer)
 	{
-		printf("\nStarting Timer 0 with 5Hz\n");
-		Hardware::Instance()->GetTimer0().SetTimer(5);
-		Hardware::Instance()->GetTimer0().Start();
-		start = !start;
+		// xTaskCreatePinnedToCore(spin_task, "stats", 4096, NULL, 3, NULL, 1);
+		// printf("\nStarting Timer 0 with 5Hz\n");
+		// Hardware::Instance()->GetTimer1().SetTimer(16000);
+		// Hardware::Instance()->GetTimer1().Start();
+		// Hardware::Instance()->GetTimer0().SetTimer(16000);
+		// Hardware::Instance()->GetTimer0().Start();
+		printf("\nStarting Timer 1 with 5Hz\n");
+		for(;;)
+		{
+			Hardware::Instance()->GetLeds().Refresh();
+			vTaskDelay(100);
+		}
 	}
 	else
 	{
 		printf("\nStoping Timer 0\n");
-		Hardware::Instance()->GetTimer0().Stop();
-		start = !start;
+		//Hardware::Instance()->GetTimer1().Stop();
 	}
+	startTimer = !startTimer;
+}
+
+void TestI2sClock()
+{
+	if(startI2s)
+	{
+		printf("\nStarting I2s at 25MHz\n");
+		// Hardware::Instance()->GetI2s().Start(Hal::Gpio::GpioIndex::Gpio26);
+		uint8_t buffer[100];
+		
+		for(uint16_t i = 0; i < 100; i ++)
+			buffer[i] = 0xAA;
+		
+		for(;;)
+		{
+			// Hardware::Instance()->GetI2s().Send(buffer, 100);
+		}
+	}
+	else
+	{
+		
+	}
+	startI2s = !startI2s;	
 }

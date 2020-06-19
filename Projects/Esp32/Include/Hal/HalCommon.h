@@ -296,11 +296,7 @@ public:
 static_assert(sizeof(LedColor) == 3);
 
 static constexpr uint8_t MaxAddressableLeds = 10;
-union LedsArray
-{
-	array<uint8_t, sizeof(LedColor) * MaxAddressableLeds> Bytes;
-	array<LedColor, MaxAddressableLeds> Led;
-};
+using LedsArray = array<LedColor, MaxAddressableLeds>;
 static_assert(sizeof(LedsArray) == 30, "Array has invalid size.");
 
 static constexpr uint8_t MacAddressMaxLength = 6;

@@ -57,6 +57,10 @@ void executetMenu(char Test)
 	case 'D':
 		TestTimer();
 		break;
+	case 'i':
+	case 'I':
+		TestI2sClock();
+		break;
 	default:
 		break;
 	}
@@ -71,6 +75,7 @@ void executetMenu(char Test)
 	printf("[W] - WiFi Menu\n");
 	printf("[C] - Camera Menu\n");
 	printf("[D] - Test Timer [ON/OFF]\n");
+	printf("[I] - Test I2S Clock on pin 26 [ON/OFF]\n");
 }
 
 extern "C" void app_main(void)
