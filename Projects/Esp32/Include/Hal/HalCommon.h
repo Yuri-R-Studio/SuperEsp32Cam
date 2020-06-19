@@ -16,8 +16,8 @@ using std::array;
 
 enum class I2sBus : uint8_t
 {
-	Bus_0,
-	Bus_1,
+	I2s0,
+	I2s1,
 };
 
 enum class I2sChannelFormat : uint8_t
@@ -250,6 +250,58 @@ enum class Bank : uint8_t
 	Bank2,
 	Unknown = 255
 };
+
+class LedColor
+{
+public:
+
+	union Colors
+	{
+		struct
+		{
+			uint8_t Green;
+			uint8_t Red;
+			uint8_t Blue;
+		}Color;
+		array<uint8_t, sizeof(Color)> Bytes;
+	};
+	Colors Led = {};
+	LedColor( uint8_t Red, uint8_t Green, uint8_t Blue)
+	{
+		this->Led.Color.Red = Red;
+		this->Led.Color.Blue = Blue;
+		this->Led.Color.Green = Green;
+	}
+	LedColor()
+	{
+		this->Led.Color.Red = 0;
+		this->Led.Color.Blue = 0;
+		this->Led.Color.Green = 0;
+	}
+	LedColor operator=(const LedColor otherLed)
+	{
+		this->Led.Color.Red = otherLed.Led.Color.Red;
+		this->Led.Color.Blue = otherLed.Led.Color.Blue;
+		this->Led.Color.Green = otherLed.Led.Color.Green;
+		return *this;
+	}
+	LedColor operator=(const Colors Led)
+	{
+		this->Led.Color.Red = Led.Color.Red;
+		this->Led.Color.Blue = Led.Color.Blue;
+		this->Led.Color.Green = Led.Color.Green;
+		return *this;
+	}
+};
+static_assert(sizeof(LedColor) == 3);
+
+static constexpr uint8_t MaxAddressableLeds = 10;
+union LedsArray
+{
+	array<uint8_t, sizeof(LedColor) * MaxAddressableLeds> Bytes;
+	array<LedColor, MaxAddressableLeds> Led;
+};
+static_assert(sizeof(LedsArray) == 30, "Array has invalid size.");
 
 static constexpr uint8_t MacAddressMaxLength = 6;
 using MacAddress = array<uint8_t, MacAddressMaxLength>;
