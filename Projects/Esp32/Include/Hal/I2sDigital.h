@@ -14,14 +14,14 @@ class I2sDigital
 {
 public:
 	I2sDigital(Gpio *gpio, Gpio::GpioIndex i2sPin, I2sBus i2sBus);
-	~I2sDigital();
+	~I2sDigital(); 
 	void Stop();
 	bool UpdateChannelClock(I2sBitSample sampleBit, uint32_t sampleRate);
 	void Start(Gpio::GpioIndex data);
 	void Refresh();
 	bool Send(const uint8_t *buffer, uint32_t size, uint32_t timeout = 0);
 	bool Init( I2sBitSample bitSample, uint32_t bufferSize, uint32_t sampleRate, bool autoTrigger);
-	bool UpdateBuffer(uint8_t *buffer, uint32_t size, uint32_t offset);
+	bool UpdateBuffer(uint8_t *sssssbuffer, uint32_t size, uint32_t offset);
 private:
 	Gpio *_gpio;
 	Gpio::GpioIndex _i2sPin;
@@ -33,8 +33,7 @@ private:
 	bool _autoTrigger;
 	uint8_t _bufferCounts;
 	static constexpr uint32_t DefaultConfigurationModeData = (I2S_MODE_MASTER | I2S_MODE_TX);
-	// This number is limited by fifo_conf.tx_data_num (6 bits)
-	static constexpr uint32_t BytesPerBuffer = 60;
+	static constexpr uint32_t BytesPerBuffer = 600;
 	bool _enabled = false;
 };
 } // namespace Hal

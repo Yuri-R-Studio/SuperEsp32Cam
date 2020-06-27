@@ -491,7 +491,7 @@ static void spin_task(void *arg)
 
     while (1)
 	{
-		Hardware::Instance()->GetLeds().Refresh();
+		// Hardware::Instance()->GetLeds().Refresh();
         vTaskDelay(100);
     }
 }
@@ -509,7 +509,7 @@ void TestTimer()
 		printf("\nStarting Timer 1 with 5Hz\n");
 		for(;;)
 		{
-			Hardware::Instance()->GetLeds().Refresh();
+			// Hardware::Instance()->GetLeds().Refresh();
 			vTaskDelay(100);
 		}
 	}
@@ -531,11 +531,7 @@ void TestI2sClock()
 		
 		for(uint16_t i = 0; i < 100; i ++)
 			buffer[i] = 0xAA;
-		
-		for(;;)
-		{
-			// Hardware::Instance()->GetI2s().Send(buffer, 100);
-		}
+		// Hardware::Instance()->GetI2s().Send(buffer, 100);
 	}
 	else
 	{

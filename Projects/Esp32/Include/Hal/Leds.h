@@ -83,7 +83,7 @@ private:
 	static constexpr uint16_t BytesPerColor = 3;
 	// How many colos each leds has
 	static constexpr uint8_t LedColors = 3;
-	static constexpr uint32_t RefreshFrequency = 25000000;
+	static constexpr uint32_t RefreshFrequency = 20000000;
 	uint16_t _highCounter = 0;
 
 	void TimerCallback() override;

@@ -36,7 +36,7 @@ public:
 	Hardware();
 	~Hardware();
 	Gpio &GetGpio() { return _gpio; }
-	Leds &GetLeds() { return _leds; }
+	// Leds &GetLeds() { return _leds; }
 	Spiffs &GetSpiffs() { return _spiffs; }
 	Camera &GetCamera() { return _camera; }
 	DebugPort &GetDebugPort() { return _debugPort; }
@@ -49,7 +49,7 @@ public:
 	Timer &GetTimer1() { return _timer1; }
 	Adc &GetAdc() { return _adc; }
 	Dac &GetDac() { return _dac; }
-	I2sDigital &GetI2s() { return _i2sDigital; }
+	// I2sDigital &GetI2s() { return _i2sDigital; }
 	
 	uint32_t Milliseconds();
 	void TimerCallback();
@@ -96,8 +96,8 @@ private:
 	Timer _timer0;
 	Timer _timer1;
 	Dac _dac;
-	I2sDigital _i2sDigital;
-	Leds _leds;
+	// I2sDigital _i2sDigital;
+	// Leds _leds;
 };
 } // namespace Hal
 

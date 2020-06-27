@@ -85,7 +85,7 @@ bool I2sDigital::Init( I2sBitSample bitSample, uint32_t bufferSize,
 	i2sPeripheral->fifo_conf.val = 0;
 	i2sPeripheral->fifo_conf.tx_fifo_mod_force_en = 1;
 	i2sPeripheral->fifo_conf.tx_fifo_mod = 2;
-	i2sPeripheral->fifo_conf.tx_data_num = BytesPerBuffer;
+	i2sPeripheral->fifo_conf.tx_data_num = 32;
 	i2sPeripheral->fifo_conf.dscr_en = 1;
 	i2sPeripheral->conf_chan.val = 0;
 	i2sPeripheral->conf_chan.tx_chan_mod = 0;
@@ -98,6 +98,25 @@ bool I2sDigital::Init( I2sBitSample bitSample, uint32_t bufferSize,
 	i2sPeripheral->conf.tx_msb_shift = 0;
 	i2sPeripheral->conf.tx_mono = 0;
 	i2sPeripheral->conf.tx_short_sync = 0;
+	
+	const uint32_t lc_conf_reset_flags = I2S_IN_RST_M | I2S_OUT_RST_M | I2S_AHBM_RST_M | I2S_AHBM_FIFO_RST_M;
+	i2sPeripheral->lc_conf.val |= lc_conf_reset_flags;
+	i2sPeripheral->lc_conf.val &= ~lc_conf_reset_flags;
+
+	const uint32_t conf_reset_flags = I2S_RX_RESET_M | I2S_RX_FIFO_RESET_M | I2S_TX_RESET_M | I2S_TX_FIFO_RESET_M;
+	i2sPeripheral->conf.val |= conf_reset_flags;
+	i2sPeripheral->conf.val &= ~conf_reset_flags;
+	while (i2sPeripheral->state.rx_fifo_reset_back);
+
+	i2sPeripheral->lc_conf.val    = I2S_OUT_DATA_BURST_EN | I2S_OUTDSCR_BURST_EN;
+	//dmaBufferDescriptorActive = 0;
+	i2sPeripheral->out_link.addr = (uint32_t)&_dmaBuffer[0];
+	i2sPeripheral->out_link.start = 1;
+	i2sPeripheral->int_clr.val = i2sPeripheral->int_raw.val;
+	i2sPeripheral->int_ena.val = 0;
+	
+	//start transmission
+	i2sPeripheral->conf.tx_start = 1;
 	return true;
 }
 
@@ -139,29 +158,42 @@ bool I2sDigital::UpdateBuffer(uint8_t *buffer, uint32_t size, uint32_t offset)
 		return false;
 
 	// Seek the offsets and buffers chunks in the buffer array
-	uint16_t firstBuffer = offset / BytesPerBuffer;
+	uint16_t bufferIndex = offset / BytesPerBuffer;
 	uint16_t firstBytes = offset % BytesPerBuffer;
 	uint16_t buffersCount = (offset + size) / BytesPerBuffer;
 	uint16_t bytesLeft = (offset + size) % BytesPerBuffer;
-	uint16_t bufferIndex = firstBuffer;
-
+#ifdef I2S_DEBUG
+		printf("-----------------------------------------------------------------------------------------------\n");
+#endif
 	// Copy the first partial buffer
 	if (firstBytes != 0)
 	{
-		memcpy((void*)(_dmaBuffer[firstBuffer].buf + firstBytes), (void*)buffer, BytesPerBuffer - firstBytes);
-		firstBuffer++;
+		uint8_t firstCopySize = std::min(BytesPerBuffer - firstBytes, size);
+		memcpy((void*)(_dmaBuffer[bufferIndex].buf + firstBytes), (void*)buffer, firstCopySize);
+#ifdef I2S_DEBUG
+		printf("Buffer first parcial buffer: Buffer DMA %d, offset %d, Size %d\n", bufferIndex, firstBytes, firstCopySize);
+#endif
+		bufferIndex++;
 		buffer += firstBytes;
+		if (firstCopySize != BytesPerBuffer - firstBytes)
+		 return true;
 	}
 	// Copy all whole buffers
 	for (; bufferIndex < buffersCount; bufferIndex++)
 	{
-		memcpy((void*)_dmaBuffer[firstBuffer].buf, (void*)buffer, BytesPerBuffer);
+		memcpy((void*)_dmaBuffer[bufferIndex].buf, (void*)buffer, BytesPerBuffer);
 		buffer += BytesPerBuffer;
+#ifdef I2S_DEBUG
+		printf("Full Buffer copy: Buffer DMA %d, Size %d\n", bufferIndex, BytesPerBuffer);
+#endif
 	}
 	// If there is a last partial buffer
 	if (bytesLeft != 0)
 	{
-		memcpy((void*)_dmaBuffer[firstBuffer].buf, (void*)buffer, bytesLeft);
+		memcpy((void*)_dmaBuffer[bufferIndex].buf, (void*)buffer, bytesLeft);
+#ifdef I2S_DEBUG
+		printf("Buffer Last Partical buffer: Buffer DMA %d, Size %d\n", bufferIndex, bytesLeft);
+#endif
 	}
 
 	return true;

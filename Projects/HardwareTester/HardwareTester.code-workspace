@@ -89,7 +89,14 @@
 			"stdexcept": "cpp",
 			"streambuf": "cpp",
 			"thread": "cpp",
-			"typeinfo": "cpp"
+			"typeinfo": "cpp",
+			"locale": "c",
+			"xlocale": "c",
+			"xlocmes": "c",
+			"xlocmon": "c",
+			"xlocnum": "c",
+			"xloctime": "c",
+			"xiosbase": "c"
 		},
 		"git.ignoreLimitWarning": true
 	}
