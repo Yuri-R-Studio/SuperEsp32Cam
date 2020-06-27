@@ -26,9 +26,9 @@ Hardware::Hardware() :	_gpio(),
 						_timerInterruptHandler(),
 						_timer0(&_timerInterruptHandler, TimerSelect::Timer0),
 						_timer1(&_timerInterruptHandler, TimerSelect::Timer1),
-						_dac(&_gpio, Gpio::GpioIndex::Gpio25),
-						_i2sDigital(&_gpio, Gpio::GpioIndex::Gpio33, I2sBus::I2s1),
-						_leds(&_gpio, &_timer0, &_i2sDigital)
+						_dac(&_gpio, Gpio::GpioIndex::Gpio25)//,
+						// _i2sDigital(&_gpio, Gpio::GpioIndex::Gpio33, I2sBus::I2s1),
+						// _leds(&_gpio, &_timer0, &_i2sDigital)
 {
 	esp_chip_info(&_mcuInfo);
 	esp_base_mac_addr_get(_macAdrress.data());
