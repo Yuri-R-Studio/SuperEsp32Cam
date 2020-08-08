@@ -15,3 +15,4 @@ register_component()
 # the generated image should be flashed when the entire project is flashed to
 # the target with 'idf.py -p PORT flash'. 
 # spiffs_create_partition_image(partitions ../spiffs FLASH_IN_PROJECT)
+spiffs_create_partition_image(storage ../spiffs FLASH_IN_PROJECT)
