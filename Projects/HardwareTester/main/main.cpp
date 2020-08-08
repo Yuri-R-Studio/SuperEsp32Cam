@@ -43,7 +43,9 @@ void executetMenu(char Test)
 	case 'S':
 		TestSpiffs();
 		break;
-		break;
+	case 'v':
+	case 'V':
+		TestSdCard();
 		break;
 	case 'w':
 	case 'W':
@@ -72,6 +74,7 @@ void executetMenu(char Test)
 	printf("[R] - Software Reset Test\n");
 	printf("[F] - Deep Sleep for 5 Seconds.\n");
 	printf("[S] - Test SPIFFS\n");
+	printf("[V] - Test SD Card\n");
 	printf("[W] - WiFi Menu\n");
 	printf("[C] - Camera Menu\n");
 	printf("[D] - Test Timer [ON/OFF]\n");

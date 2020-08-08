@@ -109,6 +109,47 @@ const char *GetTestPhrase()
 	return testPhrase;
 }
 
+
+void TestSdCard()
+{
+	if (Hardware::Instance()->GetSdCard().IsMounted() == false)
+	{
+		if (Hardware::Instance()->GetSdCard().Mount() == false)
+		{
+			printf("\n\nSD Card Failed failed!\n\n");
+			return;
+		}
+	}
+
+	printf("\n\nOpening file\n");
+	FILE *f = fopen("/sdcard/hello.txt", "w");
+	if (f == NULL)
+	{
+		printf("Failed to open file for writing");
+		return;
+	}
+	fprintf(f, "SD Card is Working!!! Hooray!!! :D\n");
+	fclose(f);
+	printf("File written\n");
+
+	// Check if destination file exists before renaming
+	struct stat st;
+	if (stat("/sdcard/foo.txt", &st) == 0)
+	{
+		// Delete it if it exists
+		unlink("/sdcard/foo.txt");
+	}
+
+	// Rename original file
+	printf("Renaming file\n");
+	if (rename("/sdcard/hello.txt", "/sdcard/foo.txt") != 0)
+	{
+		printf("Rename failed\n");
+		return;
+	}
+}
+
+
 void TestSpiffs()
 {
 	if (Hardware::Instance()->GetSpiffs().IsMounted() == false)
@@ -146,38 +187,6 @@ void TestSpiffs()
 		printf("Rename failed\n");
 		return;
 	}
-
-	printf("Reading Test file\n");
-	f = fopen("/spiffs/lala.txt", "r");
-	if (f == NULL)
-	{
-		printf("Failed to open file for reading\n");
-		return;
-	}
-
-	char line[64];
-	fgets(line, sizeof(line), f);
-	fclose(f);
-
-	// Open renamed file for reading
-	printf("Reading Stored Test file\n");
-	f = fopen("/spiffs/lala.txt", "r");
-	if (f == NULL)
-	{
-		printf("Failed to open file for reading\n");
-		return;
-	}
-
-	fgets(line, sizeof(line), f);
-	fclose(f);
-	// strip newline
-	char *pos = strchr(line, '\n');
-	if (pos)
-	{
-		*pos = '\0';
-	}
-
-	printf("Read from file: '%s'\n\n", line);
 }
 
 void PutCpuToSleep()

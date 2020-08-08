@@ -26,6 +26,7 @@
 #include "TimerInterruptHandler.h"
 #include "Dac.h"
 #include "I2sDigital.h"
+#include "SdCard.h"
 
 namespace Hal
 {
@@ -49,6 +50,7 @@ public:
 	Timer &GetTimer1() { return _timer1; }
 	Adc &GetAdc() { return _adc; }
 	Dac &GetDac() { return _dac; }
+	SdCard &GetSdCard() { return _sdCard; }
 	// I2sDigital &GetI2s() { return _i2sDigital; }
 	
 	uint32_t Milliseconds();
@@ -96,6 +98,7 @@ private:
 	Timer _timer0;
 	Timer _timer1;
 	Dac _dac;
+	SdCard _sdCard;
 	// I2sDigital _i2sDigital;
 	// Leds _leds;
 };

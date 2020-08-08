@@ -29,7 +29,12 @@
                 "C:/esp/esp-idf/components/lwip/include/apps",
                 "C:/esp/esp-idf/components/esp_adc_cal/include",
                 "C:/esp/esp-idf/components/spi_flash/include",
-                "C:/esp/esp-idf/components/spi_flash/include"
+                "C:/esp/esp-idf/components/spi_flash/include",
+                "C:/esp/esp-idf/components/log/include",
+                "C:/esp/esp-idf/components/fatfs/vfs",
+                "C:/esp/esp-idf/components/fatfs/src",
+                "C:/esp/esp-idf/components/wear_levelling/include",
+                "C:/esp/esp-idf/components/sdmmc/include"
             ],
             "defines": [
                 "_DEBUG",

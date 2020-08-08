@@ -24,6 +24,7 @@ void ReadString(char * string, uint8_t size);
 void CameraMenu();
 void TestTimer();
 void TestI2sClock();
+void TestSdCard();
 
 const char *GetTestPhrase();
 
