@@ -27,7 +27,9 @@
                 "${workspaceFolder}/../Esp32/Libraries/freertos-addons/Source/include",
                 "${env:IDF_TOOLS}/**",
                 "${env:IDF_PATH}/components/**",
-                "C:/YuriCode/SuperEsp32Cam/Projects/Esp32/Include/Hal/Camera/Conversions"
+                "C:/YuriCode/SuperEsp32Cam/Projects/Esp32/Include/Hal/Camera/Conversions",
+                "C:/esp/esp-idf/components/esp_http_server/include",
+                "C:/YuriCode/SuperEsp32Cam/Projects/Esp32/Include/Hal/Camera/Driver"
             ],
             "defines": [],
             "cStandard": "c11",

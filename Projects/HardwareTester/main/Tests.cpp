@@ -507,44 +507,62 @@ static void spin_task(void *arg)
 
 void TestTimer()
 {
-	if (startTimer)
-	{
-		// xTaskCreatePinnedToCore(spin_task, "stats", 4096, NULL, 3, NULL, 1);
-		// printf("\nStarting Timer 0 with 5Hz\n");
-		// Hardware::Instance()->GetTimer1().SetTimer(16000);
-		// Hardware::Instance()->GetTimer1().Start();
-		// Hardware::Instance()->GetTimer0().SetTimer(16000);
-		// Hardware::Instance()->GetTimer0().Start();
-		printf("\nStarting Timer 1 with 5Hz\n");
-		for(;;)
-		{
-			// Hardware::Instance()->GetLeds().Refresh();
-			vTaskDelay(100);
-		}
-	}
-	else
-	{
-		printf("\nStoping Timer 0\n");
-		//Hardware::Instance()->GetTimer1().Stop();
-	}
-	startTimer = !startTimer;
+		#define RED   0xFF0000
+	#define GREEN 0x00FF00
+	#define BLUE  0x0000FF
+	Hal::Rmt::led_state new_state;
+	new_state.leds[0] = RED;
+	new_state.leds[1] = GREEN;
+	new_state.leds[2] = BLUE;
+
+	Hardware::Instance()->GetRmt().Write(new_state);
+	// if (startTimer)
+	// {
+	// 	// xTaskCreatePinnedToCore(spin_task, "stats", 4096, NULL, 3, NULL, 1);
+	// 	// printf("\nStarting Timer 0 with 5Hz\n");
+	// 	// Hardware::Instance()->GetTimer1().SetTimer(16000);
+	// 	// Hardware::Instance()->GetTimer1().Start();
+	// 	// Hardware::Instance()->GetTimer0().SetTimer(16000);
+	// 	// Hardware::Instance()->GetTimer0().Start();
+	// 	printf("\nStarting Timer 1 with 5Hz\n");
+	// 	for(;;)
+	// 	{
+	// 		// Hardware::Instance()->GetLeds().Refresh();
+	// 		vTaskDelay(100);
+	// 	}
+	// }
+	// else
+	// {
+	// 	printf("\nStoping Timer 0\n");
+	// 	//Hardware::Instance()->GetTimer1().Stop();
+	// }
+	// startTimer = !startTimer;
 }
 
 void TestI2sClock()
 {
-	if(startI2s)
-	{
-		printf("\nStarting I2s at 25MHz\n");
-		// Hardware::Instance()->GetI2s().Start(Hal::Gpio::GpioIndex::Gpio26);
-		uint8_t buffer[100];
+	#define RED   0xFF0000
+	#define GREEN 0x00FF00
+	#define BLUE  0x0000FF
+	Hal::Rmt::led_state new_state;
+	new_state.leds[0] = RED;
+	new_state.leds[1] = GREEN;
+	new_state.leds[2] = BLUE;
+
+	Hardware::Instance()->GetRmt().Write(new_state);
+	// if(startI2s)
+	// {
+	// 	printf("\nStarting I2s at 25MHz\n");
+	// 	// Hardware::Instance()->GetI2s().Start(Hal::Gpio::GpioIndex::Gpio26);
+	// 	uint8_t buffer[100];
 		
-		for(uint16_t i = 0; i < 100; i ++)
-			buffer[i] = 0xAA;
-		// Hardware::Instance()->GetI2s().Send(buffer, 100);
-	}
-	else
-	{
+	// 	for(uint16_t i = 0; i < 100; i ++)
+	// 		buffer[i] = 0xAA;
+	// 	// Hardware::Instance()->GetI2s().Send(buffer, 100);
+	// }
+	// else
+	// {
 		
-	}
-	startI2s = !startI2s;	
+	// }
+	// startI2s = !startI2s;	
 }

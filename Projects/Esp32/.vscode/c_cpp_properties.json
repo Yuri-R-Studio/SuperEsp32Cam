@@ -34,7 +34,8 @@
                 "C:/esp/esp-idf/components/fatfs/vfs",
                 "C:/esp/esp-idf/components/fatfs/src",
                 "C:/esp/esp-idf/components/wear_levelling/include",
-                "C:/esp/esp-idf/components/sdmmc/include"
+                "C:/esp/esp-idf/components/sdmmc/include",
+                "C:/esp/esp-idf/components/esp_ringbuf/include"
             ],
             "defines": [
                 "_DEBUG",
