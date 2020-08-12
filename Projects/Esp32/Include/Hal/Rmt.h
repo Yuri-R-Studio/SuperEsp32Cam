@@ -19,15 +19,20 @@
 #define LED_BUFFER_ITEMS ((NUM_LEDS * BITS_PER_LED_CMD))
 
 // These values are determined by measuring pulse timing with logic analyzer and adjusting to match datasheet. 
-#define T0H 14  // 0 bit high time
-#define T1H 52  // 1 bit high time
-#define TL  1  // low time for either bit
+// #define T0H 14  // 0 bit high time
+// #define T1H 52  // 1 bit high time
+// #define TL  1  // low time for either bit
 
 
-#define T0H 6  // 0 bit high time
-#define T0L 13  // 1 bit high time
-#define T1H  12  // low time for either bit
-#define T1L  7  // low time for either bit
+// #define T0H 6  // 0 bit high time
+// #define T0L 13  // 1 bit high time
+// #define T1H  12  // low time for either bit
+// #define T1L  7  // low time for either bit
+
+#define T0H  15  // 0 bit high time
+#define T0L  35  // 1 bit high time
+#define T1H  35  // low time for either bit
+#define T1L  15  // low time for either bit
 
 	/*
 		In order to send bits through the leds,
@@ -60,7 +65,9 @@ public:
 
 	struct led_state 
 	{
-		uint32_t leds[3];
+		uint8_t Red;
+		uint8_t Green;
+		uint8_t Blue;
 	};
 
 	Rmt(Gpio *IoPins, Gpio::GpioIndex transmitterPin);

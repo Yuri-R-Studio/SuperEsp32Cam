@@ -38,7 +38,7 @@ void Rmt::setup_rmt_data_buffer(led_state new_state)
 {
 	for (uint32_t led = 0; led < NUM_LEDS; led++)
 	{
-		uint32_t bits_to_send = new_state.leds[led];
+		uint32_t bits_to_send = (new_state.Green << 16) | (new_state.Red << 8) | new_state.Blue;
 		uint32_t mask = 1 << (BITS_PER_LED_CMD - 1);
 		for (uint32_t bit = 0; bit < BITS_PER_LED_CMD; bit++)
 		{

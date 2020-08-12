@@ -507,13 +507,8 @@ static void spin_task(void *arg)
 
 void TestTimer()
 {
-		#define RED   0xFF0000
-	#define GREEN 0x00FF00
-	#define BLUE  0x0000FF
-	Hal::Rmt::led_state new_state;
-	new_state.leds[0] = RED;
-	new_state.leds[1] = GREEN;
-	new_state.leds[2] = BLUE;
+	Hal::Rmt::led_state new_state = {};
+	new_state.Red = 0xff;
 
 	Hardware::Instance()->GetRmt().Write(new_state);
 	// if (startTimer)
@@ -541,13 +536,8 @@ void TestTimer()
 
 void TestI2sClock()
 {
-	#define RED   0xFF0000
-	#define GREEN 0x00FF00
-	#define BLUE  0x0000FF
-	Hal::Rmt::led_state new_state;
-	new_state.leds[0] = RED;
-	new_state.leds[1] = GREEN;
-	new_state.leds[2] = BLUE;
+	Hal::Rmt::led_state new_state = {};
+	new_state.Red = 0xff;
 
 	Hardware::Instance()->GetRmt().Write(new_state);
 	// if(startI2s)
