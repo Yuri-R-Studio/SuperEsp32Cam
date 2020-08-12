@@ -15,20 +15,11 @@
 // ****************************************************
 
 #define BITS_PER_LED_CMD 24 
-#define NUM_LEDS 1 
+#define NUM_LEDS 8
 #define LED_BUFFER_ITEMS ((NUM_LEDS * BITS_PER_LED_CMD))
 
-// These values are determined by measuring pulse timing with logic analyzer and adjusting to match datasheet. 
-// #define T0H 14  // 0 bit high time
-// #define T1H 52  // 1 bit high time
-// #define TL  1  // low time for either bit
-
-
-// #define T0H 6  // 0 bit high time
-// #define T0L 13  // 1 bit high time
-// #define T1H  12  // low time for either bit
-// #define T1L  7  // low time for either bit
-
+// These values are determined by measuring pulse timing with logic 
+// analyzer and adjusting to match datasheet. 
 #define T0H  15  // 0 bit high time
 #define T0L  35  // 1 bit high time
 #define T1H  35  // low time for either bit

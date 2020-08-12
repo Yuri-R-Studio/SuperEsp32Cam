@@ -38,7 +38,7 @@ public:
 	Hardware();
 	~Hardware();
 	Gpio &GetGpio() { return _gpio; }
-	// Leds &GetLeds() { return _leds; }
+	Leds &GetLeds() { return _leds; }
 	Spiffs &GetSpiffs() { return _spiffs; }
 	Camera &GetCamera() { return _camera; }
 	DebugPort &GetDebugPort() { return _debugPort; }
@@ -103,7 +103,7 @@ private:
 	SdCard _sdCard;
 	Rmt _rmt;
 	// I2sDigital _i2sDigital;
-	// Leds _leds;
+	Leds _leds;
 };
 } // namespace Hal
 

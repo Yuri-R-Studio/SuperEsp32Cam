@@ -37,19 +37,17 @@
 namespace Hal
 {
 
-Leds::Leds(Gpio *IoPins, Timer* timer, I2sDigital *i2s) : _gpio(IoPins), _timer(timer), _i2s(i2s)
+Leds::Leds(Gpio *IoPins, Timer* timer, Rmt* rmt) : _gpio(IoPins), _timer(timer), _rmt(rmt)
 {
-	// Initializing all leds as output
-	_gpio->ConfigOutput(_ledPin, Gpio::OutputType::PullUp);
-	_timer->Initlialize();
-	_timer->SetTimer(BitFrequency);
-	_timer->AddCallback(this);
-	// _cacheLeds[0].Green = 255;
-	_i2s->Init(Hal::I2sBitSample::Sample16Bits, MaxLeds * LedColors * BytesPerColor, RefreshFrequency, true);
+	
+	// _timer->Initlialize();
+	// _timer->SetTimer(BitFrequency);
+	// _timer->AddCallback(this);
 	// _timer->Start();
-	// Gpio::GpioIndex _ledPin = Gpio::GpioIndex::Gpio33;
-	// uint32_t gpioPinIndex = (1 << ((static_cast<uint32_t>(_ledPin) - 32)));
-	printf("\n\nInit Led\nLed pin:%d, index:%d\n",(static_cast<uint32_t>(_ledPin)), gpioPinIndex);
+
+#ifdef DEBUG_LEDS
+	printf("\n\nInit Led\nLed pin:%d, index:%d\n",(static_cast<uint32_t>(_ledPin)), ledPin);
+#endif
 
 	uint8_t ledBuffer [LedColors * BytesPerColor] = {};
 	uint32_t ledIndexBuffer = 0;
@@ -64,6 +62,7 @@ Leds::Leds(Gpio *IoPins, Timer* timer, I2sDigital *i2s) : _gpio(IoPins), _timer(
 				bitsLong |= ((((_outputLeds[ledIndex].Led.Bytes.data()[ledByte] >> bit) & 1) << 1) | 0b100) << (bit * 3 + 8);
 			}
 			bitsLong = bitsLong >> 8;
+
 #ifdef DEBUG_LEDS
 			printf("ledByte %d ", ledByte);
 			printf("+0x%02x ", _outputLeds[ledIndex].Led.Bytes.data()[ledByte]);
@@ -75,7 +74,6 @@ Leds::Leds(Gpio *IoPins, Timer* timer, I2sDigital *i2s) : _gpio(IoPins), _timer(
 			ledBuffer[ledIndexBuffer++] =  (bitsLong | 0x000000FF);
 		
 			printf("Led Buffer size: %d, offset:%d\n", 3, ledIndexBuffer - 3);
-			_i2s->UpdateBuffer(ledBuffer, 3, ledIndexBuffer - 3);
 		}
 	}
 	printf("Led Buffer size: %d\n",ledIndexBuffer);
@@ -83,14 +81,6 @@ Leds::Leds(Gpio *IoPins, Timer* timer, I2sDigital *i2s) : _gpio(IoPins), _timer(
 
 void Leds::TimerCallback()
 {
-	// Refresh();
-	// sendBit1();
-	// sendBit0();
-	// GPIO.out1_w1ts.data = gpioPinIndex;
-	// GPIO.out1_w1ts.data = gpioPinIndex;
-	// _gpio->Set(_ledPin);
-	// _gpio->Reset(_ledPin);
-	// _gpio->Reset(_ledPin);
 }
 
 Leds::~Leds()
