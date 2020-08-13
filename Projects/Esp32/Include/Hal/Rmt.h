@@ -2,12 +2,12 @@
 #ifndef INCLUDE_HAL_RMT_H_
 #define INCLUDE_HAL_RMT_H_
 
+// #include "Hardware.h"
 #include "HalCommon.h"
 #include "Gpio.h"
 #include "Timer.h"
 #include "Rmt.h"
 #include "driver/rmt.h"
-
 
 // Configure these based on your project needs ********
 #define LED_RMT_TX_CHANNEL RMT_CHANNEL_0
@@ -15,8 +15,8 @@
 // ****************************************************
 
 #define BITS_PER_LED_CMD 24 
-#define NUM_LEDS 8
-#define LED_BUFFER_ITEMS ((NUM_LEDS * BITS_PER_LED_CMD))
+#define NUM_LEDS 1
+#define LED_BUFFER_ITEMS (BITS_PER_LED_CMD)
 
 // These values are determined by measuring pulse timing with logic 
 // analyzer and adjusting to match datasheet. 
@@ -68,6 +68,7 @@ public:
 
 private:
 
+	static void IRAM_ATTR doneOnChannel(rmt_channel_t channel, void * arg);
 	Gpio *_gpio;
 	Gpio::GpioIndex _transmitterPin;
 	rmt_item32_t tOn = {{{T1H, 1, T1L, 0}}};

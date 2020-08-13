@@ -295,9 +295,11 @@ public:
 };
 static_assert(sizeof(LedColor) == 3);
 
-static constexpr uint8_t MaxAddressableLeds = 10;
+static constexpr uint8_t BitsPerLed = 8 * 3; // each RGB * 8 bits
+
+static constexpr uint8_t MaxAddressableLeds = 64;
 using LedsArray = array<LedColor, MaxAddressableLeds>;
-static_assert(sizeof(LedsArray) == 30, "Array has invalid size.");
+//static_assert(sizeof(LedsArray) == 30, "Array has invalid size.");
 
 static constexpr uint8_t MacAddressMaxLength = 6;
 using MacAddress = array<uint8_t, MacAddressMaxLength>;

@@ -509,6 +509,8 @@ void TestTimer()
 {
 	Hal::Rmt::led_state new_state = {};
 	new_state.Red = 0xff;
+	new_state.Blue = 0xff;
+	new_state.Green = 0xff;
 
 	Hardware::Instance()->GetRmt().Write(new_state);
 	// if (startTimer)
