@@ -47,29 +47,29 @@ void IRAM_ATTR Rmt::doneOnChannel(rmt_channel_t channel, void * arg)
 	}
 }
 
-void Rmt::Write(led_state new_state)
+void Rmt::Write(Led led)
 {
 	RmtBufferLed.LedIndex = 0;
-	setup_rmt_data_buffer(new_state);
+	setup_rmt_data_buffer(led);
 	ESP_ERROR_CHECK(rmt_write_items(LED_RMT_TX_CHANNEL, &RmtBufferLed.LedBuffer[0], Hal::BitsPerLed, false));
 	rmt_register_tx_end_callback(doneOnChannel, this);
 	// ESP_ERROR_CHECK(rmt_wait_tx_done(LED_RMT_TX_CHANNEL, portMAX_DELAY));
 }
 
-void Rmt::setup_rmt_data_buffer(led_state new_state)
+void Rmt::setup_rmt_data_buffer(Led led)
 {
-	for(uint16_t led = 0; led < Hal::MaxAddressableLeds; led++)
+	for(uint16_t ledIndex = 0; ledIndex < Hal::MaxAddressableLeds; ledIndex++)
 	{
-		uint32_t bits_to_send = (new_state.Green << 16) | (new_state.Red << 8) | new_state.Blue;
+		uint32_t bits_to_send = led.Value;
 		uint32_t mask = 1 << (BITS_PER_LED_CMD - 1);
 		for (uint32_t bit = 0; bit < BITS_PER_LED_CMD; bit++)
 		{
 			uint32_t bit_is_set = bits_to_send & mask;
 
 			if (bit_is_set)
-				RmtBufferLed.LedBuffer[led * BITS_PER_LED_CMD + bit] = tOn;
+				RmtBufferLed.LedBuffer[ledIndex * BITS_PER_LED_CMD + bit] = tOn;
 			else
-				RmtBufferLed.LedBuffer[led * BITS_PER_LED_CMD + bit] = tOff;
+				RmtBufferLed.LedBuffer[ledIndex * BITS_PER_LED_CMD + bit] = tOff;
 
 			mask >>= 1;
 		}

@@ -54,12 +54,12 @@ Leds::Leds(Gpio *IoPins, Timer* timer, Rmt* rmt) : _gpio(IoPins), _timer(timer),
 	for (uint16_t ledIndex = 0; ledIndex < 3; ledIndex++)
 	{
 		_outputLeds[ledIndex] = BlankColor;
-		for(uint8_t ledByte = 0; ledByte < sizeof(LedColor); ledByte++)
+		for(uint8_t ledByte = 0; ledByte < sizeof(Led); ledByte++)
 		{
 			uint32_t bitsLong = 0;
 			for(uint8_t bit = 7; bit <= 7; bit--)
 			{
-				bitsLong |= ((((_outputLeds[ledIndex].Led.Bytes.data()[ledByte] >> bit) & 1) << 1) | 0b100) << (bit * 3 + 8);
+				//bitsLong |= ((((_outputLeds[ledIndex].Led.Bytes.data()[ledByte] >> bit) & 1) << 1) | 0b100) << (bit * 3 + 8);
 			}
 			bitsLong = bitsLong >> 8;
 
@@ -87,7 +87,7 @@ Leds::~Leds()
 {
 }
 
-bool Leds::SetLedColour(uint16_t ledIndex, LedColor colour)
+bool Leds::SetLedColour(uint16_t ledIndex, Led led)
 {
 	// if (ledIndex >= _cacheLeds.size())
 	// 	return false;

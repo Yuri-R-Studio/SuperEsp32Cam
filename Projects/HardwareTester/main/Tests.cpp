@@ -507,12 +507,12 @@ static void spin_task(void *arg)
 
 void TestTimer()
 {
-	Hal::Rmt::led_state new_state = {};
-	new_state.Red = 0xff;
-	new_state.Blue = 0xff;
-	new_state.Green = 0xff;
+	Hal::Led led = {};
+	led.Color.Red = 0xff /8;
+	led.Color.Blue = 0xff /3;
+	led.Color.Green = 0xff / 8;
 
-	Hardware::Instance()->GetRmt().Write(new_state);
+	Hardware::Instance()->GetRmt().Write(led);
 	// if (startTimer)
 	// {
 	// 	// xTaskCreatePinnedToCore(spin_task, "stats", 4096, NULL, 3, NULL, 1);
@@ -538,10 +538,10 @@ void TestTimer()
 
 void TestI2sClock()
 {
-	Hal::Rmt::led_state new_state = {};
-	new_state.Red = 0xff;
+	// Hal::Rmt::led_state new_state = {};
+	// new_state.Red = 0xff;
 
-	Hardware::Instance()->GetRmt().Write(new_state);
+	// Hardware::Instance()->GetRmt().Write(new_state);
 	// if(startI2s)
 	// {
 	// 	printf("\nStarting I2s at 25MHz\n");

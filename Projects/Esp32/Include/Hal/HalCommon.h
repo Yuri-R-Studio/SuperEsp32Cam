@@ -251,54 +251,23 @@ enum class Bank : uint8_t
 	Unknown = 255
 };
 
-class LedColor
+union Led
 {
-public:
-
-	union Colors
+	struct
 	{
-		struct
-		{
-			uint8_t Green;
-			uint8_t Red;
-			uint8_t Blue;
-		}Color;
-		array<uint8_t, sizeof(Color)> Bytes;
-	};
-	Colors Led = {};
-	LedColor( uint8_t Red, uint8_t Green, uint8_t Blue)
-	{
-		this->Led.Color.Red = Red;
-		this->Led.Color.Blue = Blue;
-		this->Led.Color.Green = Green;
-	}
-	LedColor()
-	{
-		this->Led.Color.Red = 0;
-		this->Led.Color.Blue = 0;
-		this->Led.Color.Green = 0;
-	}
-	LedColor operator=(const LedColor otherLed)
-	{
-		this->Led.Color.Red = otherLed.Led.Color.Red;
-		this->Led.Color.Blue = otherLed.Led.Color.Blue;
-		this->Led.Color.Green = otherLed.Led.Color.Green;
-		return *this;
-	}
-	LedColor operator=(const Colors Led)
-	{
-		this->Led.Color.Red = Led.Color.Red;
-		this->Led.Color.Blue = Led.Color.Blue;
-		this->Led.Color.Green = Led.Color.Green;
-		return *this;
-	}
+		uint8_t Blue;
+		uint8_t Red;	
+		uint8_t Green;
+	}Color;
+	array<uint8_t, sizeof(Color)> Bytes;
+	uint32_t Value;
 };
-static_assert(sizeof(LedColor) == 3);
+static_assert(sizeof(Led) == 4);
 
 static constexpr uint8_t BitsPerLed = 8 * 3; // each RGB * 8 bits
 
 static constexpr uint8_t MaxAddressableLeds = 64;
-using LedsArray = array<LedColor, MaxAddressableLeds>;
+using LedsArray = array<Led, MaxAddressableLeds>;
 //static_assert(sizeof(LedsArray) == 30, "Array has invalid size.");
 
 static constexpr uint8_t MacAddressMaxLength = 6;

@@ -54,17 +54,10 @@ class Rmt // : public Timer::Callback
 
 public:
 
-	struct led_state 
-	{
-		uint8_t Red;
-		uint8_t Green;
-		uint8_t Blue;
-	};
-
 	Rmt(Gpio *IoPins, Gpio::GpioIndex transmitterPin);
 	~Rmt();
-	void Write(led_state new_state);
-	void setup_rmt_data_buffer(led_state new_state);
+	void Write(Led led);
+	void setup_rmt_data_buffer(Led led);
 
 private:
 
