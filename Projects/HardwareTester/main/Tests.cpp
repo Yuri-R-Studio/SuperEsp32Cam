@@ -263,6 +263,7 @@ void WifiMenu()
 			printf("[1] - Client\n");
 			printf("[2] - Hotspot\n");
 			printf("[3] - Mesh Network\n");
+
 			mode = ReadKey();
 			if (mode == '1')
 			{
@@ -328,6 +329,13 @@ void WifiMenu()
 			Hardware::Instance()->GetWifi().Disable();
 		}
 		break;
+		case 'W':
+		case 'w':
+		{
+			printf("Testing Websocket.\n");
+			websocket_app_start();
+			break;;
+		}
 		case 'x':
 		case 'X':
 		{
@@ -347,6 +355,7 @@ void WifiMenu()
 		printf("[C] - Set WiFi Channel\n");
 		printf("[T] - Start Wifi\n");
 		printf("[Z] - Stop Wifi\n");
+		printf("[W] - Test Websocket\n");
 		printf("[X] - Return\n");
 
 		test = ReadKey();
@@ -511,8 +520,17 @@ void TestTimer()
 	led.Color.Red = 0xff /8;
 	led.Color.Blue = 0xff /3;
 	led.Color.Green = 0xff / 8;
+	
+	for(;;)
+	{
+		led.Value = Hardware::Instance()->GetRng().GetNumber();
+		led.Color.Red = led.Color.Red / 2;
+		led.Color.Blue = led.Color.Blue / 2;
+		led.Color.Green = led.Color.Green /  2;
+		Hardware::Instance()->GetRmt().Write(led);
+		vTaskDelay(1000);
+	}
 
-	Hardware::Instance()->GetRmt().Write(led);
 	// if (startTimer)
 	// {
 	// 	// xTaskCreatePinnedToCore(spin_task, "stats", 4096, NULL, 3, NULL, 1);
@@ -557,4 +575,68 @@ void TestI2sClock()
 		
 	// }
 	// startI2s = !startI2s;	
+}
+
+static void get_string(char *line, size_t size)
+{
+    int count = 0;
+    while (count < size) {
+        int c = fgetc(stdin);
+        if (c == '\n') {
+            line[count] = '\0';
+            break;
+        } else if (c > 0 && c < 127) {
+            line[count] = c;
+            ++count;
+        }
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+    }
+}
+
+static void websocket_app_start(void)
+{
+    esp_websocket_client_config_t websocket_cfg = {};
+
+    shutdown_signal_timer = xTimerCreate("Websocket shutdown timer", NO_DATA_TIMEOUT_SEC * 1000 / portTICK_PERIOD_MS,
+                                         pdFALSE, NULL, shutdown_signaler);
+    shutdown_sema = xSemaphoreCreateBinary();
+
+#if 0
+    char line[128];
+
+    printf("Please enter uri of websocket endpoint");
+    ReadString(line, sizeof(line));
+
+    websocket_cfg.uri = line;
+    printf( "Endpoint uri: %s\n", line);
+
+#else
+    websocket_cfg.uri = "ws://10.1.1.101";
+	websocket_cfg.path = "/socket.io/?EIO=3&transport=websocket";
+    websocket_cfg.port = 3000;
+
+#endif /* CONFIG_WEBSOCKET_URI_FROM_STDIN */
+
+    printf("Connecting to %s...\n", websocket_cfg.uri);
+
+    esp_websocket_client_handle_t client = esp_websocket_client_init(&websocket_cfg);
+    esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void *)client);
+
+    esp_websocket_client_start(client);
+    xTimerStart(shutdown_signal_timer, portMAX_DELAY);
+    char data[32];
+    int i = 0;
+    while (i < 10) {
+        if (esp_websocket_client_is_connected(client)) {
+            int len = sprintf(data, "42[\"chat\",\"Test%d\"]", i++);
+            printf("Sending %s\n", data);
+            esp_websocket_client_send_text(client, data, len, portMAX_DELAY);
+        }
+        vTaskDelay(1000 / portTICK_RATE_MS);
+    }
+
+    xSemaphoreTake(shutdown_sema, portMAX_DELAY);
+    esp_websocket_client_stop(client);
+    printf("Websocket Stopped\n");
+    esp_websocket_client_destroy(client);
 }
