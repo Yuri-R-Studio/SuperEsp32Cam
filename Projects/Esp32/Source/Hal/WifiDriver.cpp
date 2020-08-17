@@ -55,9 +55,9 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base,
 			esp_wifi_connect();
 			xEventGroupClearBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
 			s_retry_num++;
-			printf("retry to connect to the AP");
+			printf("retry to connect to the AP\n");
 		}
-		printf("connect to the AP fail");
+		printf("connect to the AP fail\n");
 	}
 	else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
 	{
