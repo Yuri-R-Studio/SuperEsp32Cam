@@ -64,8 +64,8 @@ Hardware::Hardware() :	_gpio(),
 	else
 		printf("!!! Error: Only one instance of System can be created !!!\n");
 
-	_spiffs.Mount();
-	_sdCard.Mount();
+	// _spiffs.Mount();
+	// _sdCard.Mount();
 	// i2s_write;
 	//_timer0.Initlialize();
 	// _timer0.AddCallback(this);

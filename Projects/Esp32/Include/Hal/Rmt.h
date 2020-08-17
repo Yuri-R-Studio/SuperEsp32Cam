@@ -56,8 +56,9 @@ public:
 
 	Rmt(Gpio *IoPins, Gpio::GpioIndex transmitterPin);
 	~Rmt();
-	void Write(Led led);
-	void setup_rmt_data_buffer(Led led);
+	void Write();
+	void UpdateLed(uint16_t ledId, Led color);
+	void UpdateAllLeds(LedsArray leds);
 
 private:
 

@@ -22,7 +22,7 @@ public:
 	Leds(Gpio *IoPins, Timer* timer, Rmt* rmt);
 	~Leds();
 
-	bool SetLedColour(uint16_t ledIndex, Led led);
+	bool SetLedColor(uint16_t ledIndex, Led led);
 	void SetAllLeds(LedsArray &array);
 	void ResetAllLeds();
 	void Refresh();
@@ -30,12 +30,7 @@ public:
 private:
 
 	static constexpr uint16_t MaxLeds = MaxAddressableLeds;
-	// How many bytes per color each led needs
-	// Color ex.:            0x00									0xff
-	//			   0b10010010 0b01001001 0b00100100 | 0b11011011 0b01101101 0b10110110
-	//				 |0||0||  0 ||0||0||  0 ||0||0|	|   |1||1||  1 ||1||1||  1 ||1||1|
 	static constexpr uint16_t BytesPerColor = 3;
-	// How many colos each leds has
 	static constexpr uint8_t LedColors = 3;
 
 	void TimerCallback() override;

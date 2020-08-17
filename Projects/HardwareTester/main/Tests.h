@@ -105,7 +105,7 @@ void LedMenu();
 char ReadKey();
 void ReadString(char * string, uint8_t size);
 void CameraMenu();
-void TestTimer();
+void TestLed();
 void TestI2sClock();
 void TestSdCard();
 

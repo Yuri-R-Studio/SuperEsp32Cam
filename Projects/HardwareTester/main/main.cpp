@@ -57,7 +57,7 @@ void executetMenu(char Test)
 		break;
 	case 'd':
 	case 'D':
-		TestTimer();
+		TestLed();
 		break;
 	case 'i':
 	case 'I':
@@ -86,16 +86,16 @@ extern "C" void app_main(void)
 	Hal::Hardware::Instance();
  	printf("Hardware Tester for ESP32\n");
 
-	Hal::Hardware::Instance()->GetCamera().Init();
-	startCameraServer();
+	//Hal::Hardware::Instance()->GetCamera().Init();
+	//startCameraServer();
 	
 	TestClass testClass;
 	char test = 0;
 	
 	Hal::Hardware::Instance()->GetWifi().Disable();
-	Hal::Hardware::Instance()->GetWifi().SetSsid("Camera Wifi", strlen("Camera Wifi"));
-	Hal::Hardware::Instance()->GetWifi().SetPassword("123cam123", strlen("123cam123"));
-	Hal::Hardware::Instance()->GetWifi().SetMode(Hal::WifiModeConfiguration::HotSpot);
+	Hal::Hardware::Instance()->GetWifi().SetSsid("Alga&Paula", strlen("Alga&Paula"));
+	Hal::Hardware::Instance()->GetWifi().SetPassword("minha@casa@australia", strlen("minha@casa@australia"));
+	Hal::Hardware::Instance()->GetWifi().SetMode(Hal::WifiModeConfiguration::Client);
 	Hal::Hardware::Instance()->GetWifi().SetAuthentication(Hal::WifiAuthenticationMode::Wpa2Psk);
 	Hal::Hardware::Instance()->GetWifi().Enable();
 
