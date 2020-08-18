@@ -21,12 +21,13 @@ Leds::~Leds()
 {
 }
 
-bool Leds::SetLedColor(uint16_t ledIndex)
+bool Leds::SetLedsCount(uint16_t ledIndex)
 {
 	if (ledIndex > _outputLeds.size())
 		return false;
 
 	_maxLeds = ledIndex;
+	_rmt->SetMaxLeds(_maxLeds);
 	return true;
 }
 bool Leds::SetLedColor(uint16_t ledIndex, Led led)

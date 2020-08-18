@@ -2,6 +2,7 @@
 #include "Tests.h"
 #include "esp_http_server.h"
 #include "CameraStreamTest.h"
+#include "ColorConverter.h"
 
 using Hal::Dwt;
 using Hal::Hardware;
@@ -65,9 +66,9 @@ void rgb2hsv(const unsigned char &src_r, const unsigned char &src_g, const unsig
     dst_v = (unsigned char)(v * 255); // dst_v : 0-255
 }
 
-void hsv2rgb(const unsigned char &src_h, const unsigned char &src_s, const unsigned char &src_v, unsigned char &dst_r, unsigned char &dst_g, unsigned char &dst_b)
+void hsv2rgb(const uint16_t &src_h, const unsigned char &src_s, const unsigned char &src_v, unsigned char &dst_r, unsigned char &dst_g, unsigned char &dst_b)
 {
-    float h = src_h *   2.0f; // 0-360
+    float h = src_h; // 0-360
     float s = src_s / 255.0f; // 0.0-1.0
     float v = src_v / 255.0f; // 0.0-1.0
 
@@ -596,17 +597,23 @@ void TestLed()
 	led.Color.Red = 0xff /8;
 	led.Color.Blue = 0xff /3;
 	led.Color.Green = 0xff / 8;
+	Hardware::Instance()->GetLeds().SetLedsCount(10);
 	
 	for(;;)
 	{
-		for (uint16_t i = 0; i < Hal::MaxAddressableLeds; i++)
+		for (uint16_t i = 0; i < 360; i++)
 		{
-			led.Value = Hardware::Instance()->GetRng().GetNumber();
-			led.Color.Red = led.Color.Red / 16;
-			led.Color.Blue = led.Color.Blue / 16;
-			led.Color.Green = led.Color.Green / 16;
-			Hardware::Instance()->GetLeds().SetLedColor(i, led);
-			vTaskDelay(10);
+			Hal::LedHsv hsv = {i, 255, 255};
+			Utilities::ColorConverter::HsvToRgb(hsv, led);
+			//hsv2rgb(i, 255, 255, led.Color.Red, led.Color.Green, led.Color.Blue);
+			// printf("I = %d, R=%d G=%d B=%d\n", i, led.Color.Red, led.Color.Green, led.Color.Blue);
+			// led.Value = Hardware::Instance()->GetRng().GetNumber();
+			// led.Color.Red = led.Color.Red;// / 16;
+			// led.Color.Blue = led.Color.Blue;// / 16;
+			// led.Color.Green = led.Color.Green;// / 16;
+			for(uint8_t ledIndex = 0; ledIndex < 10; ledIndex++)
+				Hardware::Instance()->GetLeds().SetLedColor(ledIndex, led);
+			vTaskDelay(50);
 		}
 
 	}

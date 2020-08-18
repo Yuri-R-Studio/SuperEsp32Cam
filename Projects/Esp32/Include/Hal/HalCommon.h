@@ -264,6 +264,19 @@ union Led
 };
 static_assert(sizeof(Led) == 4);
 
+union LedHsv
+{
+	struct
+	{
+		uint16_t Hue;
+		uint8_t Saturation;	
+		uint8_t Value;
+	}Color;
+	array<uint8_t, sizeof(Color)> Bytes;
+	uint32_t Value;
+};
+static_assert(sizeof(LedHsv) == 4);
+
 static constexpr uint8_t BitsPerLed = 8 * 3; // each RGB * 8 bits
 
 static constexpr uint8_t MaxAddressableLeds = 64;

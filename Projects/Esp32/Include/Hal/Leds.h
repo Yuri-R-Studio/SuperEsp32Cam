@@ -26,7 +26,7 @@ public:
 	void SetAllLeds(LedsArray &array);
 	void ResetAllLeds();
 	void Refresh();
-	bool SetLedColor(uint16_t ledIndex);
+	bool SetLedsCount(uint16_t ledIndex);
 private:
 
 	static constexpr uint16_t MaxLeds = MaxAddressableLeds;
