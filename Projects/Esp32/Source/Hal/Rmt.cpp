@@ -13,7 +13,8 @@ static struct
 namespace Hal
 {
 
-Rmt::Rmt(Gpio *IoPins, Gpio::GpioIndex transmitterPin) : _gpio(IoPins), _transmitterPin(transmitterPin)
+Rmt::Rmt(Gpio *IoPins, Gpio::GpioIndex transmitterPin) : _gpio(IoPins), _transmitterPin(transmitterPin),
+														_maxLeds(Hal::MaxAddressableLeds)
 {
 	rmt_config_t config;
 	config.rmt_mode = RMT_MODE_TX;
@@ -34,10 +35,20 @@ Rmt::~Rmt()
 {
 }
 
+bool Rmt::SetMaxLeds(uint16_t maxLeds)
+{
+	if (maxLeds > Hal::MaxAddressableLeds)
+		return false;
+	
+	_maxLeds = maxLeds;
+	return true;
+}
+
 void IRAM_ATTR Rmt::doneOnChannel(rmt_channel_t channel, void * arg)
 {
+	uint16_t *maxleds = (uint16_t*)arg;
 	RmtBufferLed.LedIndex++;
-	if (RmtBufferLed.LedIndex < Hal::MaxAddressableLeds)
+	if (RmtBufferLed.LedIndex < *maxleds)
 	{
 		ESP_ERROR_CHECK(rmt_write_items(LED_RMT_TX_CHANNEL, 
 						&RmtBufferLed.LedBuffer[Hal::BitsPerLed * RmtBufferLed.LedIndex],
@@ -49,7 +60,7 @@ void Rmt::Write()
 {
 	RmtBufferLed.LedIndex = 0;
 	ESP_ERROR_CHECK(rmt_write_items(LED_RMT_TX_CHANNEL, &RmtBufferLed.LedBuffer[0], Hal::BitsPerLed, false));
-	rmt_register_tx_end_callback(doneOnChannel, this);
+	rmt_register_tx_end_callback(doneOnChannel, &_maxLeds);
 }
 
 void Rmt::UpdateLed(uint16_t ledId, Led color)

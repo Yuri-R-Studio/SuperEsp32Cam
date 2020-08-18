@@ -7,7 +7,8 @@
 namespace Hal
 {
 
-Leds::Leds(Gpio *IoPins, Timer* timer, Rmt* rmt) : _gpio(IoPins), _timer(timer), _rmt(rmt)
+Leds::Leds(Gpio *IoPins, Timer* timer, Rmt* rmt) : _gpio(IoPins), _timer(timer), _rmt(rmt),
+														_maxLeds(Hal::MaxAddressableLeds)
 {
 	
 }
@@ -20,9 +21,17 @@ Leds::~Leds()
 {
 }
 
-bool Leds::SetLedColor(uint16_t ledIndex, Led led)
+bool Leds::SetLedColor(uint16_t ledIndex)
 {
 	if (ledIndex > _outputLeds.size())
+		return false;
+
+	_maxLeds = ledIndex;
+	return true;
+}
+bool Leds::SetLedColor(uint16_t ledIndex, Led led)
+{
+	if (ledIndex > _outputLeds.size() || ledIndex > _maxLeds)
 		return false;
 
 	_outputLeds.data()[ledIndex].Value = led.Value;

@@ -26,7 +26,7 @@ public:
 	void SetAllLeds(LedsArray &array);
 	void ResetAllLeds();
 	void Refresh();
-
+	bool SetLedColor(uint16_t ledIndex);
 private:
 
 	static constexpr uint16_t MaxLeds = MaxAddressableLeds;
@@ -38,6 +38,7 @@ private:
 	Gpio *_gpio;
 	Timer *_timer;
 	Rmt *_rmt;
+	uint16_t _maxLeds;
 	static constexpr Led BlankColor = {0, 255, 0};
 	
 	LedsArray _outputLeds = { };
