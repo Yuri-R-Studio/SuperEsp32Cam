@@ -61,9 +61,15 @@ public:
 	void UpdateLed(uint16_t ledId, Led color);
 	void UpdateAllLeds(LedsArray leds);
 	bool SetMaxLeds(uint16_t maxLeds);
-
+	struct RmtBufferLed
+	{
+		uint16_t LedIndex = 0;
+		uint16_t MaxLeds = 0;
+		xSemaphoreHandle Semaphore;
+		rmt_item32_t LedBuffer[Hal::BitsPerLed * Hal::MaxAddressableLeds] = {};
+	};
 private:
-	xSemaphoreHandle _semaphore = nullptr;
+	RmtBufferLed _rmtBuffer = {};
 	static void IRAM_ATTR doneOnChannel(rmt_channel_t channel, void * arg);
 	Gpio *_gpio;
 	Gpio::GpioIndex _transmitterPin;

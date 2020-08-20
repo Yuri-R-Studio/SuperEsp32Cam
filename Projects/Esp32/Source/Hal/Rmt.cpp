@@ -4,13 +4,6 @@
 #include "Dwt.h"
 #include "DebugAssert.h"
 
-static struct 
-{
-	uint16_t LedIndex = 0;
-	rmt_item32_t LedBuffer[Hal::BitsPerLed * Hal::MaxAddressableLeds] = {};
-}RmtBufferLed;
-
-
 namespace Hal
 {
 using Utilities::DebugAssert;
@@ -31,8 +24,8 @@ Rmt::Rmt(Gpio *IoPins, Gpio::GpioIndex transmitterPin, RmtChannel channel) : _gp
 
 	ESP_ERROR_CHECK(rmt_config(&config));
 	ESP_ERROR_CHECK(rmt_driver_install(config.channel, 0, 0));
-	_semaphore = xSemaphoreCreateBinary();
-	xSemaphoreGive(_semaphore);
+	_rmtBuffer.Semaphore = xSemaphoreCreateBinary();
+	xSemaphoreGive(_rmtBuffer.Semaphore);
 }
 
 Rmt::~Rmt()
@@ -50,21 +43,21 @@ bool Rmt::SetMaxLeds(uint16_t maxLeds)
 
 void IRAM_ATTR Rmt::doneOnChannel(rmt_channel_t channel, void * arg)
 {
-	uint16_t *maxleds = (uint16_t*)arg;
-	RmtBufferLed.LedIndex++;
-	if (RmtBufferLed.LedIndex < *maxleds)
+	Hal::Rmt::RmtBufferLed* rmtBuffer = (RmtBufferLed*)arg;
+	rmtBuffer->LedIndex++;
+	if (rmtBuffer->LedIndex < rmtBuffer->MaxLeds)
 	{
 		ESP_ERROR_CHECK(rmt_write_items(LED_RMT_TX_CHANNEL, 
-						&RmtBufferLed.LedBuffer[Hal::BitsPerLed * RmtBufferLed.LedIndex],
+						&rmtBuffer->LedBuffer[Hal::BitsPerLed * rmtBuffer->LedIndex],
 						Hal::BitsPerLed, false));
 	}
 }
 
 void Rmt::Write()
 {
-	RmtBufferLed.LedIndex = 0;
-	ESP_ERROR_CHECK(rmt_write_items(LED_RMT_TX_CHANNEL, &RmtBufferLed.LedBuffer[0], Hal::BitsPerLed, false));
-	rmt_register_tx_end_callback(doneOnChannel, &_maxLeds);
+	_rmtBuffer.LedIndex = 0;
+	ESP_ERROR_CHECK(rmt_write_items(LED_RMT_TX_CHANNEL, &_rmtBuffer.LedBuffer[0], Hal::BitsPerLed, false));
+	rmt_register_tx_end_callback(doneOnChannel, &_rmtBuffer);
 	//xSemaphoreTake(_semaphore, portMAX_DELAY);
 }
 
@@ -77,9 +70,9 @@ void Rmt::UpdateLed(uint16_t ledId, Led color)
 		uint32_t bit_is_set = bits_to_send & mask;
 
 		if (bit_is_set)
-			RmtBufferLed.LedBuffer[ledId * BITS_PER_LED_CMD + bit] = tOn;
+			_rmtBuffer.LedBuffer[ledId * BITS_PER_LED_CMD + bit] = tOn;
 		else
-			RmtBufferLed.LedBuffer[ledId * BITS_PER_LED_CMD + bit] = tOff;
+			_rmtBuffer.LedBuffer[ledId * BITS_PER_LED_CMD + bit] = tOff;
 
 		mask >>= 1;
 	}
@@ -96,9 +89,9 @@ void Rmt::UpdateAllLeds(LedsArray leds)
 			uint32_t bit_is_set = bits_to_send & mask;
 
 			if (bit_is_set)
-				RmtBufferLed.LedBuffer[ledIndex * BITS_PER_LED_CMD + bit] = tOn;
+				_rmtBuffer.LedBuffer[ledIndex * BITS_PER_LED_CMD + bit] = tOn;
 			else
-				RmtBufferLed.LedBuffer[ledIndex * BITS_PER_LED_CMD + bit] = tOff;
+				_rmtBuffer.LedBuffer[ledIndex * BITS_PER_LED_CMD + bit] = tOff;
 
 			mask >>= 1;
 		}
