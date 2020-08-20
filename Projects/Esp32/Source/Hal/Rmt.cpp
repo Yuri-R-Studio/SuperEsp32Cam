@@ -51,14 +51,18 @@ void IRAM_ATTR Rmt::doneOnChannel(rmt_channel_t channel, void * arg)
 						&rmtBuffer->LedBuffer[Hal::BitsPerLed * rmtBuffer->LedIndex],
 						Hal::BitsPerLed, false));
 	}
+	else
+		xSemaphoreGive(rmtBuffer->Semaphore);
 }
 
 void Rmt::Write()
 {
+	xSemaphoreTake(_rmtBuffer.Semaphore, portMAX_DELAY);
+	// Give a delay of 100 micro seconds to flush the last writing if there was
+	Dwt::DelayMicrosecond(100);
 	_rmtBuffer.LedIndex = 0;
 	ESP_ERROR_CHECK(rmt_write_items(LED_RMT_TX_CHANNEL, &_rmtBuffer.LedBuffer[0], Hal::BitsPerLed, false));
 	rmt_register_tx_end_callback(doneOnChannel, &_rmtBuffer);
-	//xSemaphoreTake(_semaphore, portMAX_DELAY);
 }
 
 void Rmt::UpdateLed(uint16_t ledId, Led color)
