@@ -27,15 +27,29 @@
  * @param function					The function the check the result
  * @param result					The result expected
  */
-#define DebugAssert(function, result)                                     \
-	do                                                                    \
-	{                                                                     \
-		int __err_rc = (int)function;                                     \
-		if (__err_rc != result)                                           \
-		{                                                                 \
-			Utilities::DebugAssert::Assert(__err_rc, __FILE__, __LINE__, \
-											__ASSERT_FUNC, #function);    \
-		}                                                                 \
+#define DebugAssertMessage(result, ...)                             				\
+	do                                                                    			\
+	{                                                                     			\
+		if (result == false)                                           				\
+		{                                                                 			\
+			Utilities::DebugAssert::AssertFail(__FILE__, __LINE__, __VA_ARGS__);	\
+		}                                                                 			\
+	} while (0)
+
+/**
+ * @brief Test the result, if different prints the error and breaks in an assert
+ * @param function					The function the check the result
+ * @param result					The result expected
+ */
+#define DebugAssert(function, result)                                     			\
+	do                                                                    			\
+	{                                                                     			\
+		int __err_rc = (int)function;                                     			\
+		if (__err_rc != result)                                           			\
+		{                                                                 			\
+			Utilities::DebugAssert::Assert(__err_rc, __FILE__, __LINE__, 			\
+											__ASSERT_FUNC, #function);    			\
+		}                                                                 			\
 	} while (0)
 
 /**
