@@ -14,6 +14,19 @@ namespace Hal
 
 using std::array;
 
+enum class RmtChannel : uint8_t
+{
+    RmtChannel0 = 0,
+    RmtChannel1,
+    RmtChannel2,
+    RmtChannel3,
+    RmtChannel4,
+    RmtChannel5,
+    RmtChannel6,
+    RmtChannel7,
+    RmtChannelMax
+};
+
 enum class I2sBus : uint8_t
 {
 	I2s0,

@@ -8,6 +8,7 @@
 #include "Timer.h"
 #include "Rmt.h"
 #include "driver/rmt.h"
+//#include "freertos/FreeRTOS.h"
 
 // Configure these based on your project needs ********
 #define LED_RMT_TX_CHANNEL RMT_CHANNEL_0
@@ -54,7 +55,7 @@ class Rmt // : public Timer::Callback
 
 public:
 
-	Rmt(Gpio *IoPins, Gpio::GpioIndex transmitterPin);
+	Rmt(Gpio *IoPins, Gpio::GpioIndex transmitterPin, RmtChannel channel);
 	~Rmt();
 	void Write();
 	void UpdateLed(uint16_t ledId, Led color);
@@ -62,10 +63,12 @@ public:
 	bool SetMaxLeds(uint16_t maxLeds);
 
 private:
+	xSemaphoreHandle _semaphore = nullptr;
 	static void IRAM_ATTR doneOnChannel(rmt_channel_t channel, void * arg);
 	Gpio *_gpio;
 	Gpio::GpioIndex _transmitterPin;
 	uint16_t _maxLeds;
+	RmtChannel _channel;
 	rmt_item32_t tOn = {{{T1H, 1, T1L, 0}}};
 	rmt_item32_t tOff = {{{T0H, 1, T0L, 0}}};
 	// This is the buffer which the hw peripheral will access while pulsing the output pin

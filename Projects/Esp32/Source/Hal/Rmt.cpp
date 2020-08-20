@@ -2,6 +2,7 @@
 #include "HalCommon.h"
 #include "Rmt.h"
 #include "Dwt.h"
+#include "DebugAssert.h"
 
 static struct 
 {
@@ -12,13 +13,14 @@ static struct
 
 namespace Hal
 {
+using Utilities::DebugAssert;
 
-Rmt::Rmt(Gpio *IoPins, Gpio::GpioIndex transmitterPin) : _gpio(IoPins), _transmitterPin(transmitterPin),
-														_maxLeds(Hal::MaxAddressableLeds)
+Rmt::Rmt(Gpio *IoPins, Gpio::GpioIndex transmitterPin, RmtChannel channel) : _gpio(IoPins), _transmitterPin(transmitterPin),
+														_maxLeds(Hal::MaxAddressableLeds), _channel(channel)
 {
 	rmt_config_t config;
 	config.rmt_mode = RMT_MODE_TX;
-	config.channel = RMT_CHANNEL_0;
+	config.channel = static_cast<rmt_channel_t>(_channel);
 	config.gpio_num = static_cast<gpio_num_t>(_transmitterPin);
 	config.mem_block_num = 3;
 	config.tx_config.loop_en = false;
@@ -29,6 +31,8 @@ Rmt::Rmt(Gpio *IoPins, Gpio::GpioIndex transmitterPin) : _gpio(IoPins), _transmi
 
 	ESP_ERROR_CHECK(rmt_config(&config));
 	ESP_ERROR_CHECK(rmt_driver_install(config.channel, 0, 0));
+	_semaphore = xSemaphoreCreateBinary();
+	xSemaphoreGive(_semaphore);
 }
 
 Rmt::~Rmt()
@@ -61,6 +65,7 @@ void Rmt::Write()
 	RmtBufferLed.LedIndex = 0;
 	ESP_ERROR_CHECK(rmt_write_items(LED_RMT_TX_CHANNEL, &RmtBufferLed.LedBuffer[0], Hal::BitsPerLed, false));
 	rmt_register_tx_end_callback(doneOnChannel, &_maxLeds);
+	//xSemaphoreTake(_semaphore, portMAX_DELAY);
 }
 
 void Rmt::UpdateLed(uint16_t ledId, Led color)
