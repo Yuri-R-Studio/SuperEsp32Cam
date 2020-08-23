@@ -16,7 +16,7 @@ public:
 
 private:
     bool _websocketConnected = false;
-    TimeLimit pingTimeout = {};
+    // TimeLimit pingTimeout = {};
     bool analyzeRequest(char * path, char * host);
 
     void disconnectStream();
