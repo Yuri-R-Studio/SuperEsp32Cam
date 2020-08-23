@@ -29,7 +29,8 @@ Hardware::Hardware() :	_gpio(),
 						_dac(&_gpio, Gpio::GpioIndex::Gpio25),
 						_sdCard(&_gpio, Gpio::GpioIndex::Gpio2, Gpio::GpioIndex::Gpio15, Gpio::GpioIndex::Gpio14, Gpio::GpioIndex::Gpio13),
 						_rmt(&_gpio, Gpio::GpioIndex::Gpio33, RmtChannel::RmtChannel0),
-						_leds(&_gpio, &_timer0, &_rmt)
+						_leds(&_gpio, &_timer0, &_rmt),
+						_ioExtender(&_gpio)
 {
 	esp_chip_info(&_mcuInfo);
 	esp_base_mac_addr_get(_macAdrress.data());

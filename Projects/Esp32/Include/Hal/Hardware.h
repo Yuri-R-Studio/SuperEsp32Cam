@@ -28,6 +28,7 @@
 #include "I2sDigital.h"
 #include "SdCard.h"
 #include "Rmt.h"
+#include "IoExtender.h"
 
 namespace Hal
 {
@@ -52,9 +53,9 @@ public:
 	Adc &GetAdc() { return _adc; }
 	Dac &GetDac() { return _dac; }
 	SdCard &GetSdCard() { return _sdCard; }
-	// I2sDigital &GetI2s() { return _i2sDigital; }
 	Rmt &GetRmt(){ return _rmt; }
-	
+	IoExtender& GetIoExtender() { return _ioExtender; }
+
 	uint32_t Milliseconds();
 	void TimerCallback();
 	ResetReason GetResetReason();
@@ -102,8 +103,8 @@ private:
 	Dac _dac;
 	SdCard _sdCard;
 	Rmt _rmt;
-	// I2sDigital _i2sDigital;
 	Leds _leds;
+	IoExtender _ioExtender;
 };
 } // namespace Hal
 
