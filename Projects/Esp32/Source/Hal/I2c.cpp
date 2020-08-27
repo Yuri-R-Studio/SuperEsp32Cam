@@ -9,6 +9,8 @@ namespace Hal
 {
 I2c::I2c(Gpio *IoPins, I2cPort i2cPort, Gpio::GpioIndex Sda, Gpio::GpioIndex Scl) : _gpio(IoPins), _i2cPort(i2cPort), _sdaPin(Sda), _sclPin(Scl)
 {
+    _gpio->ConfigOutput(_sclPin, Gpio::OutputType::PullUp);
+    _gpio->ConfigOutput(_sdaPin, Gpio::OutputType::PullUp);
     _gpio->SetAlternate(_sclPin, Gpio::AltFunc::I2c);
     _gpio->SetAlternate(_sdaPin, Gpio::AltFunc::I2c);
 
@@ -23,6 +25,11 @@ I2c::I2c(Gpio *IoPins, I2cPort i2cPort, Gpio::GpioIndex Sda, Gpio::GpioIndex Scl
     i2c_driver_install(static_cast<i2c_port_t>(_i2cPort), conf.mode, 0, 0, 0);
 }
 
+I2c::~I2c()
+{
+
+}
+
 bool I2c::IsDeviceConnected(uint8_t address)
 {
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
@@ -30,6 +37,8 @@ bool I2c::IsDeviceConnected(uint8_t address)
     i2c_master_write_byte(cmd, (address << 1) | I2C_MASTER_READ, AckCheck);
     i2c_master_stop(cmd);
     esp_err_t ret = i2c_master_cmd_begin(static_cast<i2c_port_t>(_i2cPort), cmd, 1000 / portTICK_RATE_MS);
+    i2c_cmd_link_delete(cmd);
+    
     if (ret != ESP_OK)
     {
         return false;
@@ -122,7 +131,6 @@ bool I2c::Read(uint8_t slave_addr, uint8_t *data, uint32_t len)
     i2c_cmd_link_delete(cmd);
 
     return ret == ESP_OK;
-    return false;
 }
 
 bool I2c::RequestFrom(uint8_t slave_addr, uint32_t len)
@@ -140,14 +148,12 @@ bool I2c::RequestFrom(uint8_t slave_addr, uint32_t len)
     }
     esp_err_t ret = i2c_master_cmd_begin(static_cast<i2c_port_t>(_i2cPort), cmd, 1000 / portTICK_RATE_MS);
 
+    i2c_cmd_link_delete(cmd);
     if (ret == ESP_OK)
     {
         bytesToReceive = len;
         return true;
     }
-
-    i2c_cmd_link_delete(cmd);
-
     return false;
 }
 
