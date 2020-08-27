@@ -25,9 +25,9 @@
 #include "Timer.h"
 #include "TimerInterruptHandler.h"
 #include "Dac.h"
-#include "I2sDigital.h"
 #include "SdCard.h"
 #include "Rmt.h"
+#include "I2c.h"
 #include "IoExtender.h"
 
 namespace Hal
@@ -54,6 +54,7 @@ public:
 	Dac &GetDac() { return _dac; }
 	SdCard &GetSdCard() { return _sdCard; }
 	Rmt &GetRmt(){ return _rmt; }
+	I2c &GetI2c() { return _i2c; }
 	IoExtender& GetIoExtender() { return _ioExtender; }
 
 	uint32_t Milliseconds();
@@ -104,6 +105,7 @@ private:
 	SdCard _sdCard;
 	Rmt _rmt;
 	Leds _leds;
+	I2c _i2c;
 	IoExtender _ioExtender;
 };
 } // namespace Hal
