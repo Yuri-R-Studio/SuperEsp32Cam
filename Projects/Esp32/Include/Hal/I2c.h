@@ -24,6 +24,7 @@ public:
 	bool EndTransmission();
 	bool RequestFrom(uint8_t slave_addr, uint32_t len);
 	uint8_t Receive();
+	void ScanDevices();
 
 private:
 	static constexpr uint32_t DefaultFrequency = 100000;
