@@ -34,7 +34,10 @@ public:
 	bool Get(IoPin gpio);
 	
 	/// @brief Set the output state.
-	bool Set(IoPin gpio);
+	void Set(IoPin gpio, bool state = true);
+
+	/// @brief Reset the output state.
+	void Reset(IoPin gpio);
 
 	/// @brief Configure the Gpio as input.
 	void ConfigureInput(IoPin gpio);
@@ -49,8 +52,8 @@ private:
 	
 	// I2C register addresses
 	static constexpr uint8_t InputPortRegister 			= 0x00; 
-	static constexpr uint8_t OutputPortRegister 		= 0x03; 
-	static constexpr uint8_t PolarityInversionRegister 	= 0x03; 
+	static constexpr uint8_t OutputPortRegister 		= 0x01; 
+	static constexpr uint8_t PolarityInversionRegister 	= 0x02; 
 	static constexpr uint8_t ConfigurationRegister 		= 0x03; 
 
 	union IoExtenderPins
@@ -69,6 +72,8 @@ private:
 		uint8_t Value;
 	};
 
+	static_assert(sizeof(IoExtenderPins) == 1, "IoExtenderPins has invalid size.");
+
 	/// @brief Get the input/output from struct. 
 	bool getIoStatus(IoPin gpio);
 
@@ -77,6 +82,15 @@ private:
 
 	/// @brief Check if the Gpio pin is configured as input.
 	bool getBit(IoPin gpio, IoExtenderPins &ioExtender);
+
+	/// @brief Set bit in the IoExtenderPins register.
+	void setBit(IoPin gpio, IoExtenderPins &ioExtender, bool state);
+
+	/// @brief Write into Io Extender Register
+	bool writeRegister(uint8_t Register, uint8_t value);
+
+	/// @brief Read Io Extender Register
+	uint8_t readRegister(uint8_t Register);
 
 	Gpio *_gpio;
 	I2c *_i2c;

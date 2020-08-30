@@ -38,6 +38,25 @@ IoExtender::~IoExtender()
 	
 }
 
+bool IoExtender::writeRegister(uint8_t Register, uint8_t value)
+{
+	uint8_t data = value;
+	_i2c->WriteRegister(_address, Register, data);
+	data = Register;
+	_i2c->Write(_address,&data, 1);
+	_i2c->ReadRegister(_address, Register, &data);
+	DebugAssertMessage(data == value, "Byte Written %d, Byte Read %d", _ioMode.Value, data);
+	return data == value;
+}
+
+uint8_t IoExtender::readRegister(uint8_t Register)
+{
+	uint8_t data = Register;
+	_i2c->Write(_address, &data, 1);
+	_i2c->ReadRegister(_address, Register, &data);
+	return data;
+}
+
 bool IoExtender::Get(IoPin gpio)
 {
 	if (!_deviceOnline)
@@ -49,19 +68,32 @@ bool IoExtender::Get(IoPin gpio)
 	return getIoStatus(gpio);
 }
 
-bool IoExtender::Set(IoPin gpio)
+void IoExtender::Set(IoPin gpio, bool state)
 {
 	if (!_deviceOnline)
-		return false;
+		return;
 
+	setBit(gpio, _ioStatus, state);
 	Refresh();
-	return false;
+	return;
+}
+
+void IoExtender::Reset(IoPin gpio)
+{
+	if (!_deviceOnline)
+		return;
+
+	setBit(gpio, _ioStatus, false);
+	Refresh();
+	return;
 }
 
 void IoExtender::ConfigureInput(IoPin gpio)
 {
 	if (!_deviceOnline)
 		return;
+
+	setBit(gpio, _ioMode, true);
 	Refresh(true);
 }
 
@@ -69,7 +101,7 @@ void IoExtender::ConfigureOutput(IoPin gpio)
 {
 	if (!_deviceOnline)
 		return;
-
+	setBit(gpio, _ioStatus, false);
 	Refresh(true);
 }
 
@@ -81,13 +113,12 @@ void IoExtender::Refresh(bool updateConfig)
 	if (updateConfig)
 	{
 		// Update configuration in the Chip
-		_ioMode.Value = 5;
-		uint8_t data = _ioMode.Value;
-		_i2c->WriteRegister(_address, ConfigurationRegister, data);
-		_i2c->ReadRegister(_address, ConfigurationRegister, &data);
-		DebugAssertMessage(data == _ioMode.Value, "Byte Written %d, Byte Read %d", _ioMode.Value, data);
+		writeRegister(PolarityInversionRegister, 0);
+		writeRegister(ConfigurationRegister, _ioMode.Value);
 	}
-
+	
+	writeRegister(OutputPortRegister, _ioStatus.Value);
+	_ioStatus.Value = readRegister(InputPortRegister);
 }
 
 bool IoExtender::isInput(IoPin gpio)
@@ -138,6 +169,40 @@ bool IoExtender::getBit(IoPin gpio, IoExtenderPins &ioExtender)
 		break;
 	}
 	return false;
+}
+
+void IoExtender::setBit(IoPin gpio, IoExtenderPins &ioExtender, bool state)
+{
+	switch (gpio)
+	{
+	case IoPin::Gpio1:
+		ioExtender.Status.Gpio1 = state;
+		break;
+	case IoPin::Gpio2:
+		ioExtender.Status.Gpio2 = state;
+		break;
+	case IoPin::Gpio3:
+		ioExtender.Status.Gpio3 = state;
+		break;
+	case IoPin::Gpio4:
+		ioExtender.Status.Gpio4 = state;
+		break;
+	case IoPin::Gpio5:
+		ioExtender.Status.Gpio5 = state;
+		break;
+	case IoPin::Gpio6:
+		ioExtender.Status.Gpio6 = state;
+		break;
+	case IoPin::Gpio7:
+		ioExtender.Status.Gpio7 = state;
+		break;
+	case IoPin::Gpio8:
+		ioExtender.Status.Gpio8 = state;
+		break;
+	default:
+		break;
+	}
+	return;
 }
 
 }; // namespace Hal
