@@ -16,6 +16,7 @@ public:
 	bool IsDeviceConnected(uint8_t address);
 	bool Write(uint8_t slave_addr, uint8_t *data, uint8_t len);
 	bool WriteRegister(uint8_t slave_addr, uint8_t byteRegister, uint8_t byte);
+	bool ReadRegister(uint8_t slave_addr, uint8_t byteRegister, uint8_t * byte);
 	bool Read(uint8_t slave_addr, uint8_t *data, uint32_t len);
 
 	// Arduino Port
