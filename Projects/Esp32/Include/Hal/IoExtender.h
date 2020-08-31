@@ -36,17 +36,32 @@ public:
 	/// @brief Set the output state.
 	void Set(IoPin gpio, bool state = true);
 
+	/// @brief Set All pins that are configured as output.
+	void SetAll();
+
 	/// @brief Reset the output state.
 	void Reset(IoPin gpio);
+
+	/// @brief Reset All pins that are configured as output.
+	void ResetAll();
 
 	/// @brief Configure the Gpio as input.
 	void ConfigureInput(IoPin gpio);
 
+	/// @brief Configure the all Gpio as input. 0b00010011 -> turns output 1, 2 and 5 in input. 
+	void ConfigureInput(uint8_t value);
+
 	/// @brief Configure the Gpio as output.
 	void ConfigureOutput(IoPin gpio);
 
+	/// @brief Configure the all Gpio as output. 0b00010011 -> turns output 1, 2 and 5 in outputs. 
+	void ConfigureOutput(uint8_t value);
+
 	/// @brief Flush the input/output and the Io configuration
 	void Refresh(bool updateConfig = false);
+
+	/// @brief Returns the input register
+	bool GetInputs();
 
 private:
 	

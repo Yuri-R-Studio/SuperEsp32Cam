@@ -96,7 +96,9 @@
 			"xlocmon": "c",
 			"xlocnum": "c",
 			"xloctime": "c",
-			"xiosbase": "c"
+			"xiosbase": "c",
+			"xstring": "cpp",
+			"xutility": "cpp"
 		},
 		"git.ignoreLimitWarning": true
 	}

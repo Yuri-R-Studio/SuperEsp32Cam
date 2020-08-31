@@ -480,6 +480,63 @@ void LedMenu()
 	}
 }
 
+void IoExtenderMenu()
+{
+	char test = 0;
+
+	while (1)
+	{
+		switch (test)
+		{
+			case 's':
+			case 'S':
+			{
+				printf("\nAll GPIO on the IO Extender are turned on.\n");
+				
+				Hardware::Instance()->GetIoExtender().ConfigureOutput(0xFF);
+
+				Hardware::Instance()->GetIoExtender().SetAll();				
+			}
+			break;
+			case 'd':
+			case 'D':
+			{
+				printf("\nAll GPIO on the IO Extender are turned off.\n");
+				Hardware::Instance()->GetIoExtender().ConfigureOutput(0xFF);
+				Hardware::Instance()->GetIoExtender().ResetAll();
+
+			}
+			break;
+			case 'f':
+			case 'F':
+			{
+				Hardware::Instance()->GetIoExtender().ConfigureInput(0xFF);
+				printf("\nThe Inputs value:%x\n", Hardware::Instance()->GetIoExtender().GetInputs());
+				
+			}
+			break;
+			case 'x':
+			case 'X':
+			{
+				return;
+			}
+			break;
+			default:
+				break;
+			}
+
+		printf("\n");
+		printf("IO Extender menu:\n");
+		printf("----------\n");
+		printf("[S] - Turn on all outputs\n");
+		printf("[D] - Turn off all outputs\n");
+		printf("[F] - Read Inputs\n");
+		printf("[X] - Return\n");
+
+		test = ReadKey();
+	}
+}
+
 void CameraMenu()
 {
 	char test = 0;
@@ -601,19 +658,30 @@ void TestLed()
 	
 	for(;;)
 	{
-		for (uint16_t i = 0; i < 360; i++)
+		uint16_t color = Hardware::Instance()->GetRng().GetNumber() % 361;
+		Hal::LedHsv hsv = {color, 255, 255};
+		 
+		for (uint16_t i = 0; i < 256; i++)
 		{
-			Hal::LedHsv hsv = {i, 255, 255};
+			hsv.Color.Value = i;
+			hsv.Color.Saturation = 255;
 			Utilities::ColorConverter::HsvToRgb(hsv, led);
-			//hsv2rgb(i, 255, 255, led.Color.Red, led.Color.Green, led.Color.Blue);
-			// printf("I = %d, R=%d G=%d B=%d\n", i, led.Color.Red, led.Color.Green, led.Color.Blue);
-			// led.Value = Hardware::Instance()->GetRng().GetNumber();
-			// led.Color.Red = led.Color.Red;// / 16;
-			// led.Color.Blue = led.Color.Blue;// / 16;
-			// led.Color.Green = led.Color.Green;// / 16;
 			for(uint8_t ledIndex = 0; ledIndex < 10; ledIndex++)
 				Hardware::Instance()->GetLeds().SetLedColor(ledIndex, led);
-			vTaskDelay(50);
+			if (i != 0)
+				vTaskDelay((50 / i));
+			//printf("i = %d -> R=%d, G=%d, B=%d\n", i, led.Color.Red, led.Color.Blue, led.Color.Blue);
+		}
+		// printf("-----------------------\n");
+		for (uint16_t i = 255; i != 0; i--)
+		{
+			hsv.Color.Value = i;
+			hsv.Color.Saturation = 255;
+			Utilities::ColorConverter::HsvToRgb(hsv, led);
+			for(uint8_t ledIndex = 0; ledIndex < 10; ledIndex++)
+				Hardware::Instance()->GetLeds().SetLedColor(ledIndex, led);
+			vTaskDelay((50 / i));
+			//printf("i = %d -> R=%d, G=%d, B=%d\n", i, led.Color.Red, led.Color.Blue, led.Color.Blue);
 		}
 
 	}

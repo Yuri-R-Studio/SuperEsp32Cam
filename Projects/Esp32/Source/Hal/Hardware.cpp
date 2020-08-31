@@ -31,7 +31,7 @@ Hardware::Hardware() :	_gpio(),
 						_rmt(&_gpio, Gpio::GpioIndex::Gpio33, RmtChannel::RmtChannel0),
 						_leds(&_gpio, &_timer0, &_rmt),
 						_i2c(&_gpio, Hal::I2cPort::I2c0, Gpio::GpioIndex::Gpio4, Gpio::GpioIndex::Gpio27),
-						_ioExtender(&_gpio, &_i2c, 0x18)
+						_ioExtender(&_gpio, &_i2c, Gpio::GpioIndex::Gpio32, 0x18)
 {
 	esp_chip_info(&_mcuInfo);
 	esp_base_mac_addr_get(_macAdrress.data());
@@ -66,6 +66,10 @@ Hardware::Hardware() :	_gpio(),
 	else
 		printf("!!! Error: Only one instance of System can be created !!!\n");
 
+#ifdef HARDWARE_TESTER
+	_i2c.ScanDevices();
+	_ioExtender.Refresh(true);
+#endif
 	// _spiffs.Mount();
 	// _sdCard.Mount();
 	// i2s_write;

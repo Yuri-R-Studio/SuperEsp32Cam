@@ -74,6 +74,7 @@ bool I2c::BeginTransmission(uint8_t address)
     i2c_master_write_byte(cmd, (address << 1) | I2C_MASTER_READ, AckCheck);
     i2c_master_stop(cmd);
     esp_err_t ret = i2c_master_cmd_begin(static_cast<i2c_port_t>(_i2cPort), cmd, 1000 / portTICK_RATE_MS);
+    i2c_cmd_link_delete(cmd);
     if (ret != ESP_OK)
     {
         return false;
@@ -86,6 +87,7 @@ bool I2c::Send(uint8_t byte)
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_write_byte(cmd, byte | I2C_MASTER_WRITE, AckCheck);
     esp_err_t ret = i2c_master_cmd_begin(static_cast<i2c_port_t>(_i2cPort), cmd, 1000 / portTICK_RATE_MS);
+    i2c_cmd_link_delete(cmd);
     if (ret != ESP_OK)
     {
         return false;
@@ -125,7 +127,6 @@ bool I2c::WriteRegister(uint8_t slave_addr, uint8_t byteRegister, uint8_t byte)
     i2c_master_start(cmd);
     uint8_t commandByte[2] = {byteRegister, byte};
     i2c_master_write_byte(cmd, (slave_addr << 1) | I2C_MASTER_WRITE, AckCheck);
-    //i2c_master_write(cmd, &byteRegister, 1, static_cast<i2c_ack_type_t>(AckValue));
     i2c_master_write(cmd, commandByte, 2, static_cast<i2c_ack_type_t>(AckValue));
     i2c_master_stop(cmd);
     esp_err_t ret = i2c_master_cmd_begin(static_cast<i2c_port_t>(_i2cPort), cmd, 1000 / portTICK_RATE_MS);
@@ -138,10 +139,6 @@ bool I2c::ReadRegister(uint8_t slave_addr, uint8_t byteRegister, uint8_t * byte)
 {
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
-    // uint8_t commandByte[2] = {byteRegister, byte};
-    i2c_master_write_byte(cmd, (slave_addr << 1) | I2C_MASTER_WRITE, AckCheck);
-    //i2c_master_write(cmd, &byteRegister, 1, static_cast<i2c_ack_type_t>(AckValue));
-    i2c_master_write(cmd, &byteRegister, 1, static_cast<i2c_ack_type_t>(AckValue));
     i2c_master_write_byte(cmd, (slave_addr << 1) | I2C_MASTER_READ, AckCheck);
     i2c_master_read_byte(cmd, byte, static_cast<i2c_ack_type_t>(AckValue));
     i2c_master_stop(cmd);

@@ -61,7 +61,7 @@ void executetMenu(char Test)
 		break;
 	case 'i':
 	case 'I':
-		TestI2sClock();
+		IoExtenderMenu();
 		break;
 	default:
 		break;
@@ -78,7 +78,7 @@ void executetMenu(char Test)
 	printf("[W] - WiFi Menu\n");
 	printf("[C] - Camera Menu\n");
 	printf("[D] - Test Timer [ON/OFF]\n");
-	printf("[I] - Test I2S Clock on pin 26 [ON/OFF]\n");
+	printf("[I] - IO Extender menu\n");
 }
 
 extern "C" void app_main(void)
@@ -92,6 +92,9 @@ extern "C" void app_main(void)
 	TestClass testClass;
 	char test = 0;
 	
+
+	//TestLed();
+
 	Hal::Hardware::Instance()->GetWifi().Disable();
 	Hal::Hardware::Instance()->GetWifi().SetSsid("Alga&Paula", strlen("Alga&Paula"));
 	Hal::Hardware::Instance()->GetWifi().SetPassword("minha@casa@australia", strlen("minha@casa@australia"));

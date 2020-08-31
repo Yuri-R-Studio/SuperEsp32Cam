@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include "DebugAssert.h"
 
+
+#define DEBUG_IO_EXTENDER
+
 namespace Hal
 {
 
@@ -20,6 +23,14 @@ IoExtender::IoExtender(Gpio *IoPins, I2c *i2c, Gpio::GpioIndex resetPin, uint8_t
 		_gpio->ConfigOutput(_resetPin, Gpio::OutputType::PullUp);
 		_gpio->Reset(_resetPin);
 		_gpio->Set(_resetPin);
+
+
+	uint8_t data = 5;
+	_i2c->WriteRegister(_address, 2, data);
+	data = 2;
+	_i2c->Write(_address, &data, 1);
+	_i2c->ReadRegister(_address, 2, &data);
+	DebugAssertMessage(data == 5, "Address : %d, Register : %d, Byte Written %d, Byte Read %d", _address, 2, 5, data);
 	}
 
 	if(_i2c->IsDeviceConnected(_address))
@@ -43,9 +54,9 @@ bool IoExtender::writeRegister(uint8_t Register, uint8_t value)
 	uint8_t data = value;
 	_i2c->WriteRegister(_address, Register, data);
 	data = Register;
-	_i2c->Write(_address,&data, 1);
+	_i2c->Write(_address, &data, 1);
 	_i2c->ReadRegister(_address, Register, &data);
-	DebugAssertMessage(data == value, "Byte Written %d, Byte Read %d", _ioMode.Value, data);
+	DebugAssertMessage(data == value, "Address : %d, Register : %d, Byte Written %d, Byte Read %d", _address, Register, value, data);
 	return data == value;
 }
 
@@ -68,12 +79,44 @@ bool IoExtender::Get(IoPin gpio)
 	return getIoStatus(gpio);
 }
 
+bool IoExtender::GetInputs()
+{
+	if (!_deviceOnline)
+		return false;
+
+	Refresh();
+
+	return _ioStatus.Value;
+}
+
 void IoExtender::Set(IoPin gpio, bool state)
 {
 	if (!_deviceOnline)
 		return;
 
 	setBit(gpio, _ioStatus, state);
+	Refresh();
+	return;
+}
+
+void IoExtender::SetAll()
+{
+	if (!_deviceOnline)
+		return;
+
+	_ioStatus.Value = 0xFF;
+
+	Refresh();
+	return;
+}
+
+void IoExtender::ResetAll()
+{
+	if (!_deviceOnline)
+		return;
+
+	_ioStatus.Value = 0;
+
 	Refresh();
 	return;
 }
@@ -97,11 +140,29 @@ void IoExtender::ConfigureInput(IoPin gpio)
 	Refresh(true);
 }
 
+void IoExtender::ConfigureInput(uint8_t value)
+{
+	if (!_deviceOnline)
+		return;
+
+	_ioMode.Value |= value;
+	Refresh(true);
+}
+
 void IoExtender::ConfigureOutput(IoPin gpio)
 {
 	if (!_deviceOnline)
 		return;
-	setBit(gpio, _ioStatus, false);
+	setBit(gpio, _ioMode, false);
+	Refresh(true);
+}
+
+void IoExtender::ConfigureOutput(uint8_t value)
+{
+	if (!_deviceOnline)
+		return;
+	value = ~value;
+	_ioMode.Value &= value;
 	Refresh(true);
 }
 
@@ -115,10 +176,16 @@ void IoExtender::Refresh(bool updateConfig)
 		// Update configuration in the Chip
 		writeRegister(PolarityInversionRegister, 0);
 		writeRegister(ConfigurationRegister, _ioMode.Value);
+#ifdef DEBUG_IO_EXTENDER
+		printf("IoExtender: Refreshing configuration Register: %x\n", _ioMode.Value);
+#endif
 	}
 	
 	writeRegister(OutputPortRegister, _ioStatus.Value);
 	_ioStatus.Value = readRegister(InputPortRegister);
+#ifdef DEBUG_IO_EXTENDER
+		printf("IoExtender: OutputInput Register: %x\n", _ioStatus.Value);
+#endif
 }
 
 bool IoExtender::isInput(IoPin gpio)

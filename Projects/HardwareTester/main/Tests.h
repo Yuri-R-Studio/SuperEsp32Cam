@@ -108,6 +108,7 @@ void CameraMenu();
 void TestLed();
 void TestI2sClock();
 void TestSdCard();
+void IoExtenderMenu();
 
 const char *GetTestPhrase();
 
